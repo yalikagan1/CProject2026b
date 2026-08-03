@@ -6,7 +6,8 @@
 Error errors[] = {
     {ERROR_CODE_1,  "Line length is too long"},
     {ERROR_CODE_2,  "Extra characters after macro declaration"},
-    {ERROR_CODE_3,  "Invalid macro name"}
+    {ERROR_CODE_3,  "Invalid macro name"},
+    {ERROR_CODE_4,  "Can't open file"}
 };
 
 void print_inner_error(int e) {

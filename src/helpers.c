@@ -36,3 +36,10 @@ int check_line_length(char *line, char *filename, int line_counter) {
         print_error(ERROR_CODE_1, filename, line_counter);
     return ret_val;
 }
+
+char * add_file_extention(char *filepath, char *ext) {
+    char *filename = malloc(strlen(filepath) + strlen(ext));
+    strcpy(filename, filepath);
+    strcat(filename, ext);
+    return filename;
+}

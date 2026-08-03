@@ -32,7 +32,7 @@ void free_list(node *head) {
 void print_list(node *head) {
     node *current = head;
     while (current != NULL) {
-        printf("%s %s\n\n\n", current->macro_name, current->macro_content);
+        printf("name = %s\t content = %s\n\n\n", current->macro_name, current->macro_content);
         current = current->next;
     }
 }
