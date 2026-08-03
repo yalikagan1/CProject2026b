@@ -24,27 +24,28 @@ void main_macro_expand(char *filepath) {
     bool is_macro = false;
     int line_counter = 0, found_error = 0;
     node *head = NULL, *temp_node;
+    FILE *file, *file_write;
     filename = add_file_extention(filepath, ".as");
     output_file = add_file_extention(filepath, ".am");
 
-    FILE* file = fopen(filename, "r");
-    FILE* file_write = fopen(output_file, "w");
+    file = fopen(filename, "r");
+    file_write = fopen(output_file, "w");
 
     /* Check if the file was opened successfully. */
     if (file != NULL ) {
-        // Read each line from the file and store it in the
+        /* Read each line from the file and store it in the */
         while (fgets(line, sizeof(line), file)) {
             line_counter++;
-            // validate line length
+            /* validate line length */
             found_error += check_line_length(line, filename, line_counter);
 
-            // remove tabs and extra whitespaces from line
+            /* remove tabs and extra whitespaces from line */
             remove_tabs(line);
             remove_extra_whitespaces(line);
 
             strcpy(temp_line, line);
 
-            // get first word in line
+            /* get first word in line */
             first_word = strtok(temp_line, " ");
             if(is_macro) {
                 if(strcmp(first_word, "endmcro\n") == 0) {
@@ -80,9 +81,9 @@ void main_macro_expand(char *filepath) {
                     first_word[strcspn(first_word, "\n")] = '\0';
                     current_mcro_txt = is_in_list(head, first_word);
                     if(current_mcro_txt) { // Found macro use
-                        fprintf(file_write, current_mcro_txt);
+                        fprintf(file_write, "%s", current_mcro_txt);
                     } else {              
-                        fprintf(file_write, line);
+                        fprintf(file_write, "%s", line);
                     }
                 }
             }
