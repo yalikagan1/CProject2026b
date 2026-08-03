@@ -1,0 +1,5 @@
+#define OPCODES_AMOUNT 16
+
+#define REGS_AMOUNT 8
+
+#define INSTRUCTIONS_AMOUNT 4

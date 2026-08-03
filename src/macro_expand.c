@@ -6,9 +6,15 @@
 #include "macros_linked_list.h"
 #include "error_handle.h"
 #include "helpers.h"
+#include "grammar.h"
 
-void validate_macro_name(char *macro_name) {
-    // TODO : validate macro name
+int validate_macro_name(char *macro_name, char *filename, int line_counter) {
+    macro_name[strcspn(macro_name, "\n")] = '\0';
+    if(reg_num(macro_name) >= 0 || is_instruction(macro_name) || opcode_num(macro_name) >= 0) {
+        print_error(ERROR_CODE_3, filename, line_counter);
+        return 1;
+    }
+    return 0;
 }
 
 void main_macro_expand(char *filename) {
@@ -21,13 +27,13 @@ void main_macro_expand(char *filename) {
 
     FILE* file = fopen(filename, "r");
 
-    // Check if the file was opened successfully.
+    /* Check if the file was opened successfully. */
     if (file != NULL) {
         // Read each line from the file and store it in the
         while (fgets(line, sizeof(line), file)) {
             line_counter++;
             // validate line length
-            found_error = check_line_length(line, filename, line_counter);
+            found_error += check_line_length(line, filename, line_counter);
 
             // remove tabs and extra whitespaces from line
             remove_tabs(line);
@@ -56,7 +62,7 @@ void main_macro_expand(char *filename) {
                     is_macro = true;
 
                     mcr_name = strtok(NULL, "");
-                    // TODO : validate macro name
+                    found_error += validate_macro_name(mcr_name, filename, line_counter);
                     dynamic_mcr_name = malloc(strlen(mcr_name));
                     strcpy(dynamic_mcr_name, mcr_name);
 
@@ -70,10 +76,10 @@ void main_macro_expand(char *filename) {
                 } else {
                     current_mcro_txt = is_in_list(head, first_word);
                     if(current_mcro_txt) { // Found macro use
-                        // write current_mcro_txt to file
+                        // TODO : write current_mcro_txt to file
                         printf("%s", current_mcro_txt);
                     } else {
-                        // write line to file
+                        // TODO : write line to file
                         printf("%s", line);
                     }
                 }

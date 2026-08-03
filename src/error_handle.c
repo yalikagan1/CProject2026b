@@ -10,9 +10,9 @@ Error errors[] = {
 };
 
 void print_inner_error(int e) {
-    printf("#### ERROR #%d - %s\n", e, errors[e].txt);
+    printf("#### ERROR #%d - %s\n", e, errors[e-1].txt);
 }
 
 void print_error(int e, char *filename, int line) {
-    printf("#### ERROR #%d at file %s, line %d - %s\n", e, filename, line, errors[e].txt);
+    printf("#### ERROR #%d at file %s, line %d - %s\n", e, filename, line, errors[e-1].txt);
 }
