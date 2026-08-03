@@ -3,30 +3,30 @@
 #include <string.h>
 #include "macros_linked_list.h"
 
-node* create_node(char *macro_name, char *macro_content) {
+node* create_node(char *macro_name) {
     node *new_node = (node*)malloc(sizeof(node));
     new_node->macro_name = macro_name;
-    new_node->macro_content = macro_content;
+    new_node->macro_content = NULL;
     new_node->next = NULL;
     return new_node;
 }
 
 void add_node(node *head, node *new_node) {
-    new_node->next = head;
-    head->next = new_node;
+    node *current = head;
+    while(current->next != NULL) 
+        current = current->next;
+    current->next = new_node;
 }
 
 void free_list(node *head) {
     node *current = head;
     while (current != NULL) {
         node *next = current->next;
+        free(current->macro_name);
+        free(current->macro_content);
         free(current);
         current = next;
     }
-}
-
-void add_text_to_node(node *node, char *text) {
-    node->macro_content = strcat(node->macro_content, text);
 }
 
 void print_list(node *head) {

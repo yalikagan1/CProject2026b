@@ -4,7 +4,7 @@ typedef struct node {
     struct node *next;  /* Pointer to the next node in the linked list */
 } node;
 
-node* create_node(char *macro_name, char *macro_content);
+node* create_node(char *macro_name);
 
 void add_node(node *head, node *new_node);
 
