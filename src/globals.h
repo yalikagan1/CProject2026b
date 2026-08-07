@@ -16,9 +16,9 @@
 
 #define OPCODES_AMOUNT 16
 
-#define REGS_AMOUNT 8
+#define REGS_AMOUNT 32
 
-#define INSTRUCTIONS_AMOUNT 4
+#define INSTRUCTIONS_AMOUNT 6
 
 typedef struct Symbol {
     char name[MAX_LABEL_LENGTH + 1];

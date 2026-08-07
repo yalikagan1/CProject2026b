@@ -3,7 +3,7 @@ LOOP:   jmp  L1
 		mcro m1
 		sub  @r1, @r4
 		bne  END
-		mcroend
+		endmcro
 		prn  -5
 		bne  LOOP
 		m1
