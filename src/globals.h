@@ -14,7 +14,7 @@
 
 #define MAX_DATA_BYTES 8192
 
-#define OPCODES_AMOUNT 16
+#define OPCODES_AMOUNT 27
 
 #define REGS_AMOUNT 32
 
