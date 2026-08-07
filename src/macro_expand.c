@@ -48,7 +48,7 @@ void main_macro_expand(char *filepath) {
             /* get first word in line */
             first_word = strtok(temp_line, " ");
             if(is_macro) {
-                if(strcmp(first_word, "endmcro\n") == 0) {
+                if(strcmp(first_word, "mcroend\n") == 0) {
                     is_macro = false;
                     temp_node->macro_content = current_mcro_txt;
                     current_mcro_txt = NULL;
