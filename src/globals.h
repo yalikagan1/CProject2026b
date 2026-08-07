@@ -14,11 +14,6 @@
 
 #define MAX_DATA_BYTES 8192
 
-#define OPCODES_AMOUNT 27
-
-#define REGS_AMOUNT 32
-
-#define INSTRUCTIONS_AMOUNT 6
 
 typedef struct Symbol {
     char name[MAX_LABEL_LENGTH + 1];
@@ -37,7 +32,7 @@ typedef struct {
 } CodeImage;
 
 typedef struct {
-    char bytes[MAX_DATA_BYTES];
+    unsigned char bytes[MAX_DATA_BYTES];
     int count;
 } DataImage;
 

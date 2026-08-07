@@ -10,7 +10,7 @@
 
 int validate_macro_name(char *macro_name, char *filename, int line_counter) {
     macro_name[strcspn(macro_name, "\n")] = '\0';
-    if(reg_num(macro_name) >= 0 || is_instruction(macro_name) || opcode_num(macro_name) >= 0) {
+    if(is_reserved_word(macro_name)) {
         print_error(ERROR_CODE_3, filename, line_counter);
         return 1;
     }
