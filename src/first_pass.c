@@ -27,16 +27,17 @@ int first_pass(char *am_filename, Symbol **symbols, CodeImage *code, DataImage *
         line_number++;
         
         if (!check_if_line_is_ended(line)) {
-            error(ERROR_TOO_LONG_LINE, line_number, am_filename);
-            no_errors = 0;
-            remove_rest_of_line(am_file);
-            continue;
+            if (remove_rest_of_line(am_file)) {
+                print_error(ERROR_TOO_LONG_LINE, am_filename, line_number);
+                no_errors = 0;
+                continue;
+            }
         }
 
         trimmed_line = trim_whitespaces(line);
 
         /* comment line or empty line that not need to assemble*/
-        if (trimmed_line[0] == '\n' || trimmed_line[0] == ';'){
+        if (trimmed_line[0] == '\0' || trimmed_line[0] == ';'){
             continue;
         }
     }
@@ -46,5 +47,5 @@ int first_pass(char *am_filename, Symbol **symbols, CodeImage *code, DataImage *
     *icf = IC;
     *dcf = DC;
 
-    return 1;
+    return no_errors;
 }

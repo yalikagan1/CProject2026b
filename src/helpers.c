@@ -56,6 +56,26 @@ char *trim_whitespaces(char *str) {
     return str;
 }
 
+int check_if_line_is_ended(char *line) {
+    return strchr(line, '\n') != NULL;
+}
+
+int remove_rest_of_line(FILE *file) {
+    int c = getc(file);
+
+    /* If the file ended right there, nothing was left */
+    if (c == EOF) {
+        return 0;
+    }
+
+    /* Read and throw away everything up to the end of the current line */
+    while (c != '\n' && c != EOF) {
+        c = getc(file);
+    }
+
+    return 1;
+}
+
 char * add_file_extention(char *filepath, char *ext) {
     char *filename = malloc(strlen(filepath) + strlen(ext));
     strcpy(filename, filepath);
