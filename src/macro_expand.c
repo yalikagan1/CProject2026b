@@ -11,7 +11,7 @@
 int validate_macro_name(char *macro_name, char *filename, int line_counter) {
     macro_name[strcspn(macro_name, "\n")] = '\0';
     if(is_reserved_word(macro_name)) {
-        print_error(ERROR_CODE_3, filename, line_counter);
+        print_error(ERROR_INVALID_MACRO_NAME, filename, line_counter);
         return 1;
     }
     return 0;
@@ -74,7 +74,7 @@ void main_macro_expand(char *filepath) {
                     current_mcro_txt = malloc(0);
 
                     if(strtok(NULL, "")) {
-                        print_error(ERROR_CODE_2, filename, line_counter);
+                        print_error(ERROR_EXTRA_CHARS_AFTER_MACRO, filename, line_counter);
                         found_error = 1;
                     }
                 } else {
@@ -94,7 +94,7 @@ void main_macro_expand(char *filepath) {
         free(filename);
         free(output_file);
     } else {
-        print_error(ERROR_CODE_4, filename, 0);
+        print_error(ERROR_OPEN_FILE, filename, 0);
     }
     if(found_error) {
         remove(output_file);

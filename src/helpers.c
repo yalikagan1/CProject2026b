@@ -33,8 +33,27 @@ void remove_extra_whitespaces(char *str) {
 int check_line_length(char *line, char *filename, int line_counter) {
     int ret_val = strchr(line, '\n') == NULL;
     if(ret_val)
-        print_error(ERROR_CODE_1, filename, line_counter);
+        print_error(ERROR_TOO_LONG_LINE, filename, line_counter);
     return ret_val;
+}
+
+char *trim_whitespaces(char *str) {
+    char *end;
+
+    /* skipping whitespeces and tabs*/
+    while (*str == ' ' || *str == '\t') {
+        str++;
+    }
+
+    /* \r is there when the file was edited on Windows */
+    end = str + strlen(str);
+    while (end > str && (end[-1] == ' ' || end[-1] == '\t' ||
+                         end[-1] == '\n' || end[-1] == '\r')) {
+        end--;
+    }
+    *end = '\0';
+
+    return str;
 }
 
 char * add_file_extention(char *filepath, char *ext) {
