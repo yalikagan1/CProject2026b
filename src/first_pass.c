@@ -5,6 +5,7 @@
 #include "globals.h"
 #include "error_handle.h"
 #include "helpers.h"
+#include "line_parser.h"
 #include "first_pass.h"
 
 
@@ -16,6 +17,8 @@ int first_pass(char *am_filename, Symbol **symbols, CodeImage *code, DataImage *
     char line[MAX_LINE_LENGTH + 2];
     char *trimmed_line;
     int line_number = 0;
+    ParsedLine parsed_line;
+    int err;
 
     FILE * am_file = fopen(am_filename, "r");
     if (am_file == NULL) {
@@ -38,6 +41,13 @@ int first_pass(char *am_filename, Symbol **symbols, CodeImage *code, DataImage *
 
         /* comment line or empty line that not need to assemble*/
         if (trimmed_line[0] == '\0' || trimmed_line[0] == ';'){
+            continue;
+        }
+
+        err = parse_line(trimmed_line, &parsed_line);
+        if (err) {
+            print_error(err, am_filename, line_number);
+            no_errors = 0;
             continue;
         }
     }
