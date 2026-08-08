@@ -11,7 +11,14 @@ static Error errors[] = {
     {ERROR_LABEL_TOO_LONG,  "Label is longer than 31 characters"},
     {ERROR_INVALID_LABEL_NAME,  "Label must start with a letter and hold only letters and digits"},
     {ERROR_LABEL_IS_RESERVED_WORD,  "Label can't be a reserved word"},
-    {ERROR_MISSING_OPERATION,  "Line has no operation or directive"}
+    {ERROR_MISSING_OPERATION,  "Line has no operation or directive"},
+    {ERROR_UNKNOWN_DIRECTIVE,  "Unknown directive"},
+    {ERROR_MISSING_OPERANDS,  "Directive has no operands"},
+    {ERROR_INVALID_NUMBER,  "Operand is not a valid number"},
+    {ERROR_NUMBER_OUT_OF_RANGE,  "Number does not fit in the size of the directive"},
+    {ERROR_INVALID_COMMAS,  "Commas between the operands are not right"},
+    {ERROR_INVALID_STRING,  "String must be printable text wrapped in double quotes"},
+    {ERROR_DATA_IMAGE_FULL,  "Too much data for the memory of the machine"}
 };
 
 /* Returns text of this error code. */

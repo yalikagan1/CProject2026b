@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include "helpers.h"
 #include "error_handle.h"
 
@@ -35,6 +36,14 @@ int check_line_length(char *line, char *filename, int line_counter) {
     if(ret_val)
         print_error(ERROR_TOO_LONG_LINE, filename, line_counter);
     return ret_val;
+}
+
+char *skip_spaces(char *str) {
+    while (isspace((unsigned char)*str)) {
+        str++;
+    }
+
+    return str;
 }
 
 char *trim_whitespaces(char *str) {

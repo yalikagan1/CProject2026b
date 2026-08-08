@@ -4,6 +4,7 @@
 #include "line_parser.h"
 #include "error_handle.h"
 #include "grammar.h"
+#include "helpers.h"
 
 /* Without change the original string, returns the length of the first word of the string, 
     that is up to the first space or to the end of the string. */
@@ -15,15 +16,6 @@ static int word_length(char *str) {
     }
 
     return len;
-}
-
-/* Skips the spaces at the start of the string */
-static char *skip_spaces(char *str) {
-    while (isspace((unsigned char)*str)) {
-        str++;
-    }
-
-    return str;
 }
 
 /* Checks a label name that was already cut out of the line, without its colon.
