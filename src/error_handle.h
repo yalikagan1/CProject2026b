@@ -24,8 +24,22 @@ typedef enum ERROR_CODES {
     ERROR_DATA_IMAGE_FULL = 15
 } ERROR_CODES;
 
+/**
+ * @brief prints error in input file.
+ *
+ * This function prints error in input file.
+ * @param e number of error - according to ERROR_CODES.
+ * @param filename name of the input file.
+ * @param line number of line in the input file.
+ */
 void print_error(int e, char *filename, int line);
 
+/**
+ * @brief prints error in inner process.
+ *
+ * This function prints error in inner process.
+ * @param e number of error - according to ERROR_CODES.
+ */
 void print_inner_error(int e);
 
 #endif

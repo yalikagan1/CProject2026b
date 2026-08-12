@@ -82,8 +82,23 @@ int parse_register(char *str);
 /* Returns 1 if the name is an operation name or a directive name */
 int is_reserved_word(char *name);
 
+/**
+ * @brief check if operand is external.
+ *
+ * This function check if operand is external.
+ * @param operand string of the operand.
+ * @param s the symbols table from the input file.
+ * @return 1 if external, 0 if not.
+ */
 int is_operand_external(char *operand, Symbol *s);
 
+/**
+ * @brief check if string is number.
+ *
+ * This function check if string is number.
+ * @param str string to be checked.
+ * @return 1 if number, 0 if not.
+ */
 int is_number(char *str);
 
 #endif
