@@ -5,33 +5,34 @@
 #include "globals.h"
 
 static const Operation OPERATIONS[OPERATIONS_AMOUNT] = {
-    {"add",   0,  1, INST_TYPE_R, OP_FORMAT_RRR,   3},
-    {"sub",   0,  2, INST_TYPE_R, OP_FORMAT_RRR,   3},
-    {"and",   0,  3, INST_TYPE_R, OP_FORMAT_RRR,   3},
-    {"or",    0,  4, INST_TYPE_R, OP_FORMAT_RRR,   3},
-    {"nor",   0,  5, INST_TYPE_R, OP_FORMAT_RRR,   3},
-    {"move",  1,  1, INST_TYPE_R, OP_FORMAT_RR,    2},
-    {"mvhi",  1,  2, INST_TYPE_R, OP_FORMAT_RR,    2},
-    {"mvlo",  1,  3, INST_TYPE_R, OP_FORMAT_RR,    2},
-    {"addi", 10, -1, INST_TYPE_I, OP_FORMAT_RIR,   3},
-    {"subi", 11, -1, INST_TYPE_I, OP_FORMAT_RIR,   3},
-    {"andi", 12, -1, INST_TYPE_I, OP_FORMAT_RIR,   3},
-    {"ori",  13, -1, INST_TYPE_I, OP_FORMAT_RIR,   3},
-    {"nori", 14, -1, INST_TYPE_I, OP_FORMAT_RIR,   3},
-    {"bne",  15, -1, INST_TYPE_I, OP_FORMAT_RRL,   3},
-    {"beq",  16, -1, INST_TYPE_I, OP_FORMAT_RRL,   3},
-    {"blt",  17, -1, INST_TYPE_I, OP_FORMAT_RRL,   3},
-    {"bgt",  18, -1, INST_TYPE_I, OP_FORMAT_RRL,   3},
-    {"lb",   19, -1, INST_TYPE_I, OP_FORMAT_RIR,   3},
-    {"sb",   20, -1, INST_TYPE_I, OP_FORMAT_RIR,   3},
-    {"lw",   21, -1, INST_TYPE_I, OP_FORMAT_RIR,   3},
-    {"sw",   22, -1, INST_TYPE_I, OP_FORMAT_RIR,   3},
-    {"lh",   23, -1, INST_TYPE_I, OP_FORMAT_RIR,   3},
-    {"sh",   24, -1, INST_TYPE_I, OP_FORMAT_RIR,   3},
-    {"jmp",  30, -1, INST_TYPE_J, OP_FORMAT_JUMP,  1},
-    {"la",   31, -1, INST_TYPE_J, OP_FORMAT_LABEL, 1},
-    {"call", 32, -1, INST_TYPE_J, OP_FORMAT_LABEL, 1},
-    {"hlt",  63, -1, INST_TYPE_J, OP_FORMAT_NONE,  0}
+    {"add",   0,  1, INST_TYPE_R, OP_FORMAT_RRR,   3, NULL, NULL, NULL},
+    {"sub",   0,  2, INST_TYPE_R, OP_FORMAT_RRR,   3, NULL, NULL, NULL},
+    {"and",   0,  3, INST_TYPE_R, OP_FORMAT_RRR,   3, NULL, NULL, NULL},
+    {"or",    0,  4, INST_TYPE_R, OP_FORMAT_RRR,   3, NULL, NULL, NULL},
+    {"nor",   0,  5, INST_TYPE_R, OP_FORMAT_RRR,   3, NULL, NULL, NULL},
+    {"move",  1,  1, INST_TYPE_R, OP_FORMAT_RR,    2, NULL, NULL, NULL},
+    {"mvhi",  1,  2, INST_TYPE_R, OP_FORMAT_RR,    2, NULL, NULL, NULL},
+    {"mvlo",  1,  3, INST_TYPE_R, OP_FORMAT_RR,    2, NULL, NULL, NULL},
+    {"addi", 10, -1, INST_TYPE_I, OP_FORMAT_RIR,   3, NULL, NULL, NULL},
+    {"subi", 11, -1, INST_TYPE_I, OP_FORMAT_RIR,   3, NULL, NULL, NULL},
+    {"andi", 12, -1, INST_TYPE_I, OP_FORMAT_RIR,   3, NULL, NULL, NULL},
+    {"ori",  13, -1, INST_TYPE_I, OP_FORMAT_RIR,   3, NULL, NULL, NULL},
+    {"nori", 14, -1, INST_TYPE_I, OP_FORMAT_RIR,   3, NULL, NULL, NULL},
+    {"bne",  15, -1, INST_TYPE_I, OP_FORMAT_RRL,   3, NULL, NULL, NULL},
+    {"beq",  16, -1, INST_TYPE_I, OP_FORMAT_RRL,   3, NULL, NULL, NULL},
+    {"blt",  17, -1, INST_TYPE_I, OP_FORMAT_RRL,   3, NULL, NULL, NULL},
+    {"bgt",  18, -1, INST_TYPE_I, OP_FORMAT_RRL,   3, NULL, NULL, NULL},
+    {"lb",   19, -1, INST_TYPE_I, OP_FORMAT_RIR,   3, NULL, NULL, NULL},
+    {"sb",   20, -1, INST_TYPE_I, OP_FORMAT_RIR,   3, NULL, NULL, NULL},
+    {"lw",   21, -1, INST_TYPE_I, OP_FORMAT_RIR,   3, NULL, NULL, NULL},
+    {"sw",   22, -1, INST_TYPE_I, OP_FORMAT_RIR,   3, NULL, NULL, NULL},
+    {"lh",   23, -1, INST_TYPE_I, OP_FORMAT_RIR,   3, NULL, NULL, NULL},
+    {"jmp",  30, -1, INST_TYPE_J, OP_FORMAT_JUMP,  1, NULL, NULL, NULL},
+    {"sh",   24, -1, INST_TYPE_I, OP_FORMAT_RIR,   3, NULL, NULL, NULL},
+    {"jmp",  30, -1, INST_TYPE_J, OP_FORMAT_JUMP,  1, NULL, NULL, NULL},
+    {"la",   31, -1, INST_TYPE_J, OP_FORMAT_LABEL, 1, NULL, NULL, NULL},
+    {"call", 32, -1, INST_TYPE_J, OP_FORMAT_LABEL, 1, NULL, NULL, NULL},
+    {"hlt",  63, -1, INST_TYPE_J, OP_FORMAT_NONE,  0, NULL, NULL, NULL}
 };
 
 /* Every legal register name, so that the index is the register number */
@@ -106,8 +107,35 @@ int parse_register(char *str) {
     return -1;
 }
 
-
 int is_reserved_word(char *name) {
     return find_operation(name) != NULL || find_directive(name) != DIRECTIVE_NONE;
 }
 
+int is_operand_external(char *operand, Symbol *s) {
+    /* operand is null because it isn't relevant in it's operation */
+    if(operand == NULL)
+        return 0;
+    
+    /* operand is register or number */
+    if(parse_register(operand) != -1 || is_number(operand))
+        return 0;
+
+    while(s != NULL) {
+        if(strcmp(s->name, operand) == 0 && s->is_external)
+            return 1;
+        s = s->next;
+    }
+
+    return 0;
+}
+
+int is_number(char *str) {
+    char *end;
+
+    if (str == NULL || *str == '\0')
+        return 0;
+
+    strtol(str, &end, 10);
+
+    return *end == '\0';
+}

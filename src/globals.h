@@ -16,32 +16,12 @@
 
 #define MAX_DATA_BYTES 8192
 
+#define OPERATIONS_AMOUNT 27
 
-typedef struct Symbol {
-    char name[MAX_LABEL_LENGTH + 1];
-    int value;
-    int is_code;
-    int is_data;
-    int is_external;
-    int is_entry;
-    struct Symbol *next;
-} Symbol;
+#define DIRECTIVES_AMOUNT 6
 
+#define MIN_REGISTER 0
 
-typedef struct {
-    unsigned long words[MAX_CODE_WORDS];
-    int count;
-} CodeImage;
-
-typedef struct {
-    unsigned char bytes[MAX_DATA_BYTES];
-    int count;
-} DataImage;
-
-typedef struct ExternalRef {
-    char name[MAX_LABEL_LENGTH + 1];
-    int address;
-    struct ExternalRef *next;
-} ExternalRef;
+#define MAX_REGISTER 31
 
 #endif

@@ -2,13 +2,7 @@
 #ifndef GRAMMAR_H
 #define GRAMMAR_H
 
-#define OPERATIONS_AMOUNT 27
-
-#define DIRECTIVES_AMOUNT 6
-
-#define MIN_REGISTER 0
-
-#define MAX_REGISTER 31
+#include "globals.h"
 
 typedef enum {
     DIRECTIVE_NONE,
@@ -43,7 +37,38 @@ typedef struct {
     InstructionType type; /* The type of the operation */
     OperandFormat format; /* The format of the operands */
     int arg_num;     /* The number of arguments for the operation */
+    char *arg1; /* first argument in the operation, NULL if not relevant */
+    char *arg2; /* second argument in the operation, NULL if not relevant */
+    char *arg3; /* third argument in the operation, NULL if not relevant */
 } Operation;
+
+typedef struct Symbol {
+    char name[MAX_LABEL_LENGTH + 1];
+    int value;
+    int is_code;
+    int is_data;
+    int is_external;
+    int is_entry;
+    struct Symbol *next;
+} Symbol;
+
+
+typedef struct {
+    int current_ic;
+    Operation current;
+    CodeImage *next; 
+} CodeImage;
+
+typedef struct {
+    unsigned char bytes[MAX_DATA_BYTES];
+    int count;
+} DataImage;
+
+typedef struct ExternalRef {
+    char name[MAX_LABEL_LENGTH + 1];
+    int address;
+    struct ExternalRef *next;
+} ExternalRef;
 
 /* Returns the operation with this name, or NULL if there is no such operation */
 const Operation *find_operation(char *name);
@@ -56,5 +81,9 @@ int parse_register(char *str);
 
 /* Returns 1 if the name is an operation name or a directive name */
 int is_reserved_word(char *name);
+
+int is_operand_external(char *operand, Symbol *s);
+
+int is_number(char *str);
 
 #endif
