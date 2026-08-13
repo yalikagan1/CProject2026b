@@ -5,9 +5,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-/* Puts the node at the end of the list, so that the instructions stay in the
-   order they were written in. Takes the address of the head, because the
-   first node has to be written into the head itself */
 static void add_node_to_code_image_at_the_end(CodeImage *node, CodeImage **code) {
     CodeImage *last_node;
 
