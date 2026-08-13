@@ -6,4 +6,6 @@
 
 int create_symbol(ParsedLine parsed_line, Symbol **symbols, int *icf, int *dcf);
 
+void update_all_data_symbols(Symbol *symbols, int icf);
+
 #endif

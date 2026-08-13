@@ -90,11 +90,29 @@ Symbol *create_new_symbol(Symbol *new_symbol, char *symbol_name, Symbol **symbol
     return new_symbol;
 }
 
+void update_all_data_symbols(Symbol *symbols, int icf) {
+    Symbol *current;
+
+    for (current = symbols; current != NULL; current = current->next) {
+        if (current->is_data) {
+            current->value += icf;
+        }
+    }
+}
+
 int create_symbol(ParsedLine parsed_line, Symbol **symbols, int *icf, int *dcf) {
     int err;
+    char *symbol_name;
+    Symbol *symbol;
 
-    char *symbol_name = get_symbol_name(&parsed_line);
-    Symbol *symbol = find_symbol(symbol_name, symbols);
+    symbol_name = get_symbol_name(&parsed_line);
+
+    /* this line gives no name to the table, like an instruction with no label */
+    if (symbol_name[0] == '\0') {
+        return 0;
+    }
+    
+    symbol = find_symbol(symbol_name, symbols);
     if (symbol == NULL) {
         Symbol *new_symbol = (Symbol *)malloc(sizeof(Symbol));
         if (new_symbol == NULL) {

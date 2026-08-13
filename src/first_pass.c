@@ -8,6 +8,7 @@
 #include "line_parser.h"
 #include "first_pass.h"
 #include "symbols_table_handler.h"
+#include "data_image_handler.h"
 
 
 int first_pass(char *am_filename, Symbol **symbols, CodeImage *code, DataImage *data, int *icf, int *dcf) {
@@ -26,6 +27,8 @@ int first_pass(char *am_filename, Symbol **symbols, CodeImage *code, DataImage *
         print_error(ERROR_OPEN_FILE, am_filename, 0);
         return 0;
     }
+
+    data->count = INITIAL_DC;
 
     while (fgets(line, sizeof(line), am_file) != NULL) {
         line_number++;
@@ -51,11 +54,27 @@ int first_pass(char *am_filename, Symbol **symbols, CodeImage *code, DataImage *
             no_errors = 0;
             continue;
         }
-        err = create_symbol(parsed_line, symbols, icf, dcf);
+        err = create_symbol(parsed_line, symbols, &IC, &DC);
         if (err) {
             print_error(err, am_filename, line_number);
             no_errors = 0;
             continue;
+        }
+
+        if (parsed_line.type == DIRECTIVE_DB || parsed_line.type == DIRECTIVE_DH ||
+            parsed_line.type == DIRECTIVE_DW || parsed_line.type == DIRECTIVE_ASCIZ) {
+            err = encode_data_directive(parsed_line.type, parsed_line.operands, data);
+            if (err) {
+                print_error(err, am_filename, line_number);
+                no_errors = 0;
+                continue;
+            }
+
+            DC = data->count;
+        }
+        else if (parsed_line.type == DIRECTIVE_NONE) {
+            /* an instruction line, every instruction takes four bytes */
+            IC += 4;
         }
     }
 
@@ -63,6 +82,8 @@ int first_pass(char *am_filename, Symbol **symbols, CodeImage *code, DataImage *
 
     *icf = IC;
     *dcf = DC;
+
+    update_all_data_symbols(*symbols, IC);
 
     return no_errors;
 }
