@@ -47,6 +47,7 @@ int parse_line(char *line, ParsedLine *parsed) {
     parsed->label[0] = '\0';
     parsed->name[0] = '\0';
     parsed->operands = NULL;
+    parsed->type = DIRECTIVE_NONE;
 
     word_len = word_length(line);
 
@@ -78,6 +79,14 @@ int parse_line(char *line, ParsedLine *parsed) {
 
     strncpy(parsed->name, line, word_len);
     parsed->name[word_len] = '\0';
+
+    if (parsed->name[0] == '.') {
+        parsed->type = find_directive(parsed->name);
+
+        if (parsed->type == DIRECTIVE_NONE) {
+            return ERROR_UNKNOWN_DIRECTIVE;
+        }
+    }
 
     parsed->operands = skip_spaces(line + word_len);
 

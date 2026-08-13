@@ -1,0 +1,106 @@
+int check_symbol_validity(Symbol *symbol, ParsedLine parsed_line, Symbol **symbols, int *icf, int *dcf) {
+    if (parsed_line.type == DIRECTIVE_ENTRY) {
+        if (symbol->is_external) { /* if the symbol is external, it cannot be an entry */
+            return ERROR_SYMBOL_ENTRY_AND_EXTERN;
+        }
+        return 0;
+    }
+    if (parsed_line.type == DIRECTIVE_EXTERN) {
+        if (symbol->is_entry) { /* if the symbol is an entry, it cannot be an extern */
+            return ERROR_SYMBOL_ENTRY_AND_EXTERN;
+        }
+        if (symbol->is_code || symbol->is_data) { /* if the symbol is code or data, it cannot be an extern */
+            return ERROR_SYMBOL_ALREADY_EXISTS_BUT_INVALID;
+        }
+        return 0;
+    }
+
+    if (symbol->is_code || symbol->is_data || symbol->is_external) { /*duplicate symbol*/
+        return ERROR_SYMBOL_ALREADY_EXISTS_BUT_INVALID;
+    }
+
+    return 0;
+}
+
+int update_symbol(Symbol *symbol, ParsedLine parsed_line, Symbol **symbols, int *icf, int *dcf) {
+    int err;
+    err = check_symbol_validity(symbol, parsed_line, symbols, icf, dcf);
+    if (err != 0) {
+        return err;
+    }
+
+    if (parsed_line.type == DIRECTIVE_ENTRY) {
+        symbol->is_entry = 1;
+    }
+    else if (parsed_line.type == DIRECTIVE_EXTERN) {
+        symbol->is_external = 1;
+    }
+    else if (parsed_line.type == DIRECTIVE_DB || parsed_line.type == DIRECTIVE_DH ||
+             parsed_line.type == DIRECTIVE_DW || parsed_line.type == DIRECTIVE_ASCIZ) {
+        symbol->is_data = 1;
+        symbol->value = *dcf;
+    }
+    else {
+        symbol->is_code = 1;
+        symbol->value = *icf;
+    }
+
+    return 0;
+}
+
+Symbol *find_symbol(char *name, Symbol **symbols) {
+    Symbol *current = *symbols;
+    while (current != NULL) {
+        if (strcmp(current->name, name) == 0) {
+            return current;
+        }
+        current = current->next;
+    }
+    return NULL;
+}
+
+
+char *get_symbol_name(ParsedLine *parsed_line) {
+    if (parsed_line->type == DIRECTIVE_ENTRY || parsed_line->type == DIRECTIVE_EXTERN) {
+        return parsed_line->operands;
+    }
+    else {
+        return parsed_line->label;
+    }
+}
+
+int create_new_symbol(ParsedLine parsed_line, Symbol **symbols) {
+    Symbol *new_symbol = (Symbol *)malloc(sizeof(Symbol));
+    if (new_symbol == NULL) {
+        return ERROR_MEMORY_ALLOCATION_FAILED;
+    }
+    new_symbol->is_code = 0;
+    new_symbol->is_data = 0;
+    new_symbol->is_external = 0;
+    new_symbol->is_entry = 0;
+    new_symbol->value = 0;
+    new_symbol->next = NULL;
+    strcpy(new_symbol->name, get_symbol_name(parsed_line));
+
+    new_symbol->next = *symbols;
+    *symbols = new_symbol;
+    return 0;
+}
+
+int create_symbol(ParsedLine parsed_line, Symbol **symbols, int *icf, int *dcf) {
+    int err;
+
+    Symbol *symbol = find_symbol(get_symbol_name(parsed_line), symbols);
+    if (symbol == NULL) {
+        err = create_new_symbol(parsed_line, symbols);
+        if (err != 0) {
+            return err;
+        }
+    }
+    
+    err = update_symbol(symbol, parsed_line, symbols, icf, dcf);
+    if (err != 0) {
+        return err;
+    }
+    return 0;
+}

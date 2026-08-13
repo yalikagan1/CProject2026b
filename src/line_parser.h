@@ -5,11 +5,13 @@
 #define LINE_PARSER_H
 
 #include "globals.h"
+#include "grammar.h"
 
 typedef struct {
     char label[MAX_LABEL_LENGTH + 1];   /* An empty string when the line has no label */
     char name[MAX_LINE_LENGTH + 1];     /* The operation name, or the directive with its dot */
     char *operands;                     /* Everything after the name, not splitted yet */
+    DirectiveType type;                 /* DIRECTIVE_NONE when the line is an instruction */
 } ParsedLine;
 
 /* Takes the line apart into the struct above. The operands field points into

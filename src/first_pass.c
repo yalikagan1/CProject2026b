@@ -7,6 +7,7 @@
 #include "helpers.h"
 #include "line_parser.h"
 #include "first_pass.h"
+#include "symbols_table_handler.h"
 
 
 int first_pass(char *am_filename, Symbol **symbols, CodeImage *code, DataImage *data, int *icf, int *dcf) {
@@ -45,6 +46,12 @@ int first_pass(char *am_filename, Symbol **symbols, CodeImage *code, DataImage *
         }
 
         err = parse_line(trimmed_line, &parsed_line);
+        if (err) {
+            print_error(err, am_filename, line_number);
+            no_errors = 0;
+            continue;
+        }
+        err = create_symbol(parsed_line, symbols, icf, dcf);
         if (err) {
             print_error(err, am_filename, line_number);
             no_errors = 0;
