@@ -1,4 +1,11 @@
-int check_symbol_validity(Symbol *symbol, ParsedLine parsed_line, Symbol **symbols, int *icf, int *dcf) {
+#include <stdlib.h>
+#include <string.h>
+#include "symbols_table_handler.h"
+#include "line_parser.h"
+#include "grammar.h"
+#include "error_handle.h"
+
+int check_symbol_validity(Symbol *symbol, ParsedLine parsed_line) {
     if (parsed_line.type == DIRECTIVE_ENTRY) {
         if (symbol->is_external) { /* if the symbol is external, it cannot be an entry */
             return ERROR_SYMBOL_ENTRY_AND_EXTERN;
@@ -22,9 +29,9 @@ int check_symbol_validity(Symbol *symbol, ParsedLine parsed_line, Symbol **symbo
     return 0;
 }
 
-int update_symbol(Symbol *symbol, ParsedLine parsed_line, Symbol **symbols, int *icf, int *dcf) {
+int update_symbol(Symbol *symbol, ParsedLine parsed_line, int *icf, int *dcf) {
     int err;
-    err = check_symbol_validity(symbol, parsed_line, symbols, icf, dcf);
+    err = check_symbol_validity(symbol, parsed_line);
     if (err != 0) {
         return err;
     }
@@ -69,36 +76,34 @@ char *get_symbol_name(ParsedLine *parsed_line) {
     }
 }
 
-int create_new_symbol(ParsedLine parsed_line, Symbol **symbols) {
-    Symbol *new_symbol = (Symbol *)malloc(sizeof(Symbol));
-    if (new_symbol == NULL) {
-        return ERROR_MEMORY_ALLOCATION_FAILED;
-    }
+Symbol *create_new_symbol(Symbol *new_symbol, char *symbol_name, Symbol **symbols) {
     new_symbol->is_code = 0;
     new_symbol->is_data = 0;
     new_symbol->is_external = 0;
     new_symbol->is_entry = 0;
     new_symbol->value = 0;
     new_symbol->next = NULL;
-    strcpy(new_symbol->name, get_symbol_name(parsed_line));
+    strcpy(new_symbol->name, symbol_name);
 
     new_symbol->next = *symbols;
     *symbols = new_symbol;
-    return 0;
+    return new_symbol;
 }
 
 int create_symbol(ParsedLine parsed_line, Symbol **symbols, int *icf, int *dcf) {
     int err;
 
-    Symbol *symbol = find_symbol(get_symbol_name(parsed_line), symbols);
+    char *symbol_name = get_symbol_name(&parsed_line);
+    Symbol *symbol = find_symbol(symbol_name, symbols);
     if (symbol == NULL) {
-        err = create_new_symbol(parsed_line, symbols);
-        if (err != 0) {
-            return err;
+        Symbol *new_symbol = (Symbol *)malloc(sizeof(Symbol));
+        if (new_symbol == NULL) {
+            return ERROR_MEMORY_ALLOCATION_FAILED;
         }
+        symbol = create_new_symbol(new_symbol, symbol_name, symbols);
     }
     
-    err = update_symbol(symbol, parsed_line, symbols, icf, dcf);
+    err = update_symbol(symbol, parsed_line, icf, dcf);
     if (err != 0) {
         return err;
     }

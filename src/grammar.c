@@ -27,7 +27,6 @@ static const Operation OPERATIONS[OPERATIONS_AMOUNT] = {
     {"lw",   21, -1, INST_TYPE_I, OP_FORMAT_RIR,   3, NULL, NULL, NULL},
     {"sw",   22, -1, INST_TYPE_I, OP_FORMAT_RIR,   3, NULL, NULL, NULL},
     {"lh",   23, -1, INST_TYPE_I, OP_FORMAT_RIR,   3, NULL, NULL, NULL},
-    {"jmp",  30, -1, INST_TYPE_J, OP_FORMAT_JUMP,  1, NULL, NULL, NULL},
     {"sh",   24, -1, INST_TYPE_I, OP_FORMAT_RIR,   3, NULL, NULL, NULL},
     {"jmp",  30, -1, INST_TYPE_J, OP_FORMAT_JUMP,  1, NULL, NULL, NULL},
     {"la",   31, -1, INST_TYPE_J, OP_FORMAT_LABEL, 1, NULL, NULL, NULL},

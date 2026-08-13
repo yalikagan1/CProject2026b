@@ -18,7 +18,10 @@ static Error errors[] = {
     {ERROR_NUMBER_OUT_OF_RANGE,  "Number does not fit in the size of the directive"},
     {ERROR_INVALID_COMMAS,  "Commas between the operands are not right"},
     {ERROR_INVALID_STRING,  "String must be printable text wrapped in double quotes"},
-    {ERROR_DATA_IMAGE_FULL,  "Too much data for the memory of the machine"}
+    {ERROR_DATA_IMAGE_FULL,  "Too much data for the memory of the machine"},
+    {ERROR_MEMORY_ALLOCATION_FAILED,  "Memory allocation failed"},
+    {ERROR_SYMBOL_ALREADY_EXISTS_BUT_INVALID,  "Symbol is already defined in this file"},
+    {ERROR_SYMBOL_ENTRY_AND_EXTERN,  "Symbol can't be both an entry and an external"}
 };
 
 /* Returns text of this error code. */
