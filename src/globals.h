@@ -6,13 +6,9 @@
 
 #define MAX_LINE_LENGTH 80
 
-#define MAX_OPERANDS 3
-
 #define INITIAL_IC 100
 
 #define INITIAL_DC 0
-
-#define MAX_CODE_WORDS 2048
 
 #define MAX_DATA_BYTES 8192
 
