@@ -37,10 +37,12 @@ int second_pass(char *am_filename, Symbol *symbols, CodeImage *code,
 
     /* write data image */
     for(i = 0; i < data->count; i++) {
-        current_counter += 4;
-        fprintf(file_write, "%04d ", current_counter);
+        if(i%4 == 0) {
+            current_counter += 4;
+            fprintf(file_write, "%04d ", current_counter);
+        }
         fprintf(file_write, "%02X ", (unsigned char)data->bytes[i]);
-        if(i%4 == 0 && i > 0)
+        if(i%4 == 3)
             fprintf(file_write, "\n");
     }
 
