@@ -37,7 +37,8 @@ int main()
     };
     
     char str[12];
-    for(int i = 0; i < 13; i++) {
+    int i;
+    for(i = 0; i < 13; i++) {
         int_to_hex(encoded_instructions[i], str);
         printf("%s\n", str);
     }
