@@ -10,7 +10,7 @@ int second_pass(char *am_filename, Symbol *symbols, CodeImage *code,
     char* output_file = NULL;
     char hex_str[12];
     Operation op;
-    int binary_code;
+    int binary_code, i, current_counter;
     FILE *file_write;
 
     output_file = add_file_extention(am_filename, ".ent");
@@ -28,14 +28,23 @@ int second_pass(char *am_filename, Symbol *symbols, CodeImage *code,
     /* write code image (instructions) */
     while(code != NULL) {
         op = code->current;
-        binary_code = create_binary_code(op, symbols, code->current_ic);
+        current_counter = code->current_ic;
+        binary_code = create_binary_code(op, symbols, current_counter);
         int_to_hex(binary_code, hex_str);
-        fprintf(file_write, "%04d ", code->current_ic);
+        fprintf(file_write, "%04d ", current_counter);
         fprintf(file_write, "%s\n", hex_str);
     }
 
     /* write data image */
+    for(i = 0; i < data->count; i++) {
+        current_counter += 4;
+        fprintf(file_write, "%04d ", current_counter);
+        fprintf(file_write, "%02X ", (unsigned char)data->bytes[i]);
+        if(i%4 == 0 && i > 0)
+            fprintf(file_write, "\n");
+    }
 
+    fclose(file_write);
     /* write .ent file */
     write_entries(am_filename, symbols);
 
