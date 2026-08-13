@@ -86,3 +86,12 @@ int create_j_code(Operation op, Symbol *s);
 int get_symbol_value(char *arg, Symbol *s);
 
 void print_as_binary(int num);
+
+/**
+ * @brief encode number to hexadecimal.
+ *
+ * This function encodes number to hexadecimal according to assembler rules.
+ * @param num number to be encoded.
+ * @param str string that hex will be encoded to.
+ */
+void int_to_hex(int num, char *str);

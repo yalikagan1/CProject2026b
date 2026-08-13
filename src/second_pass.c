@@ -8,9 +8,9 @@
 int second_pass(char *am_filename, Symbol *symbols, CodeImage *code,
     DataImage *data, int *icf, int *dcf) {
     char* output_file = NULL;
+    char hex_str[12];
     Operation op;
     int binary_code;
-    Symbol *head = symbols;
     FILE *file_write;
 
     output_file = add_file_extention(am_filename, ".ent");
@@ -24,13 +24,14 @@ int second_pass(char *am_filename, Symbol *symbols, CodeImage *code,
     /* write file header (ICF DCF)*/
     fprintf(file_write, "     %d ", *icf);
     fprintf(file_write, "%d\n", *dcf);
-
+ 
     /* write code image (instructions) */
     while(code != NULL) {
         op = code->current;
         binary_code = create_binary_code(op, symbols, code->current_ic);
-        // TODO : create HEX
-        // TODO : write to file
+        int_to_hex(binary_code, hex_str);
+        fprintf(file_write, "%04d ", code->current_ic);
+        fprintf(file_write, "%s\n", hex_str);
     }
 
     /* write data image */
@@ -40,6 +41,7 @@ int second_pass(char *am_filename, Symbol *symbols, CodeImage *code,
 
     /* write .ext file*/
     write_externals(am_filename, symbols, code);
+    return 0;
     }
 
 void write_entries(char *am_filename, Symbol *symbols) {
@@ -182,14 +184,33 @@ int get_symbol_value(char *arg, Symbol *s) {
 }
 
 void print_as_binary(int num) {
-    for (int i = 31; i >= 0; i--) {
+    int i;
+    for (i = 31; i >= 0; i--) {
         int bit = (num >> i) & 1;
         printf("%d", bit);
         
-        // מוסיף רווח כל 8 ביטים (למעט בסוף)
         if (i % 8 == 0 && i != 0) {
             printf(" ");
         }
     }
     printf("\n");
+}
+
+void int_to_hex(int num, char *str) {
+    int i, j, byte, digit;
+    j = 0;
+
+    for (i = 0; i < 4; i++) {
+        byte = (num >> (i * 8)) & 255;
+
+        digit = (byte >> 4) & 15;
+        str[j++] = (digit < 10) ? '0' + digit : 'A' + digit - 10;
+
+        digit = byte & 15;
+        str[j++] = (digit < 10) ? '0' + digit : 'A' + digit - 10;
+
+        str[j++] = ' ';
+    }
+
+    str[j] = '\0';
 }
