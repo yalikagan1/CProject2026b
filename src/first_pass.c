@@ -12,7 +12,7 @@
 #include "code_image_handler.h"
 
 
-int first_pass(char *am_filename, Symbol **symbols, CodeImage *code, DataImage *data, int *icf, int *dcf) {
+int first_pass(char *am_filename, Symbol **symbols, CodeImage **code, DataImage *data, int *icf, int *dcf) {
     int IC = INITIAL_IC;
     int DC = INITIAL_DC;
     int no_errors = 1;
@@ -74,7 +74,7 @@ int first_pass(char *am_filename, Symbol **symbols, CodeImage *code, DataImage *
             DC = data->count;
         }
         else if (parsed_line.type == DIRECTIVE_NONE) {
-            err = add_instruction(parsed_line, code);
+            err = add_instruction(parsed_line, code, IC);
             if (err) {
                 print_error(err, am_filename, line_number);
                 no_errors = 0;

@@ -5,6 +5,42 @@
 #include <string.h>
 #include <stdlib.h>
 
+/* Puts the node at the end of the list, so that the instructions stay in the
+   order they were written in. Takes the address of the head, because the
+   first node has to be written into the head itself */
+static void add_node_to_code_image_at_the_end(CodeImage *node, CodeImage **code) {
+    CodeImage *last_node;
+
+    if (*code == NULL) {
+        *code = node;
+        return;
+    }
+
+    last_node = *code;
+    while (last_node->next != NULL) {
+        last_node = last_node->next;
+    }
+
+    last_node->next = node;
+}
+
+
+static void free_all_arguments(char *arg1, char *arg2, char *arg3) {
+    free(arg1);
+    free(arg2);
+    free(arg3);
+}
+
+static char *copy_argument(char *token) {
+    char *copy = malloc(strlen(token) + 1);
+
+    if (copy == NULL) {
+        return NULL;
+    }
+
+    strcpy(copy, token);
+    return copy;
+}
 
 int extract_and_assume_arguments(char *operands, Operation *operation) {
     char *token;
@@ -13,38 +49,51 @@ int extract_and_assume_arguments(char *operands, Operation *operation) {
     char *arg1 = NULL;
     char *arg2 = NULL;
     char *arg3 = NULL;
+    char *copy;
 
     token = strtok(operands, delimiter);
     while (token != NULL) {
         count++;
         if (count > operation->arg_num) {
+            free_all_arguments(arg1, arg2, arg3);
             return ERROR_TOO_MANY_OPERANDS;
         }
+
+        copy = copy_argument(token);
+        if (copy == NULL) {
+            free_all_arguments(arg1, arg2, arg3);
+            return ERROR_MEMORY_ALLOCATION_FAILED;
+        }
+
         if (count == 1) {
-            strcpy(arg1, token);
+            arg1 = copy;
         }
         if (count == 2) {
-            strcpy(arg2, token);
+            arg2 = copy;
         }
         if (count == 3) {
-            strcpy(arg3, token);
+            arg3 = copy;
         }
+
         token = strtok(NULL, delimiter);
     }
+
     if (count < operation->arg_num) {
+        free_all_arguments(arg1, arg2, arg3);
         return ERROR_TOO_FEW_OPERANDS;
     }
-    operation->arg1 = malloc(sizeof(char) * (strlen(arg1) + 1));
-    operation->arg2 = malloc(sizeof(char) * (strlen(arg2) + 1));
-    operation->arg3 = malloc(sizeof(char) * (strlen(arg3) + 1));
-    strcpy(operation->arg1, arg1);
-    strcpy(operation->arg2, arg2);
-    strcpy(operation->arg3, arg3);
+
+    /* An operand the operation does not have stays NULL */
+    operation->arg1 = arg1;
+    operation->arg2 = arg2;
+    operation->arg3 = arg3;
+
     return 0;
 }
 
-int add_instruction(ParsedLine parsed_line, CodeImage *code) {
+int add_instruction(ParsedLine parsed_line, CodeImage **code, int ic) {
     int err;
+    CodeImage *node;
     const Operation *operation = find_operation(parsed_line.name);
     Operation new_operation;
 
@@ -63,9 +112,16 @@ int add_instruction(ParsedLine parsed_line, CodeImage *code) {
         return err;
     }
 
-    code->next->current = new_operation;
-    code->next->next = NULL;
-    code->next = code->next->next;
+    node = (CodeImage *)malloc(sizeof(CodeImage));
+    if (node == NULL) {
+        free_all_arguments(new_operation.arg1, new_operation.arg2, new_operation.arg3);
+        return ERROR_MEMORY_ALLOCATION_FAILED;
+    }
+    node->operation = new_operation;
+    node->current_ic = ic;
+    node->next = NULL;
+
+    add_node_to_code_image_at_the_end(node, code);
 
     return 0;
 }

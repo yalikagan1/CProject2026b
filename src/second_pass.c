@@ -27,7 +27,7 @@ int second_pass(char *am_filename, Symbol *symbols, CodeImage *code,
  
     /* write code image (instructions) */
     while(code != NULL) {
-        op = code->current;
+        op = code->operation;
         current_counter = code->current_ic;
         binary_code = create_binary_code(op, symbols, current_counter);
         int_to_hex(binary_code, hex_str);
@@ -93,7 +93,7 @@ void write_externals(char *am_filename, Symbol *symbols, CodeImage *code) {
     }
 
     while(code != NULL) {
-        op = code->current;
+        op = code->operation;
         if(is_operand_external(op.arg1, symbols)) {
             fprintf(file_write, "%s ", op.arg1);
             fprintf(file_write, "%04d\n", code->current_ic);
