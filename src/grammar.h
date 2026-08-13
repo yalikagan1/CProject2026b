@@ -53,10 +53,10 @@ typedef struct Symbol {
 } Symbol;
 
 
-typedef struct {
+typedef struct CodeImage {
     int current_ic;
     Operation current;
-    struct CodeImage *next; 
+    struct CodeImage *next;
 } CodeImage;
 
 typedef struct {

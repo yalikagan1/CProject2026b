@@ -9,6 +9,7 @@
 #include "first_pass.h"
 #include "symbols_table_handler.h"
 #include "data_image_handler.h"
+#include "code_image_handler.h"
 
 
 int first_pass(char *am_filename, Symbol **symbols, CodeImage *code, DataImage *data, int *icf, int *dcf) {
@@ -73,7 +74,12 @@ int first_pass(char *am_filename, Symbol **symbols, CodeImage *code, DataImage *
             DC = data->count;
         }
         else if (parsed_line.type == DIRECTIVE_NONE) {
-            /* an instruction line, every instruction takes four bytes */
+            err = add_instruction(parsed_line, code);
+            if (err) {
+                print_error(err, am_filename, line_number);
+                no_errors = 0;
+                continue;
+            }
             IC += 4;
         }
     }

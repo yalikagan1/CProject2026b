@@ -21,7 +21,9 @@ static Error errors[] = {
     {ERROR_DATA_IMAGE_FULL,  "Too much data for the memory of the machine"},
     {ERROR_MEMORY_ALLOCATION_FAILED,  "Memory allocation failed"},
     {ERROR_SYMBOL_ALREADY_EXISTS_BUT_INVALID,  "Symbol is already defined in this file"},
-    {ERROR_SYMBOL_ENTRY_AND_EXTERN,  "Symbol can't be both an entry and an external"}
+    {ERROR_SYMBOL_ENTRY_AND_EXTERN,  "Symbol can't be both an entry and an external"},
+    {ERROR_TOO_MANY_OPERANDS,  "Too many operands for the operation"},
+    {ERROR_TOO_FEW_OPERANDS,  "Too few operands for the operation"},
 };
 
 /* Returns text of this error code. */
