@@ -29,7 +29,7 @@ int check_symbol_validity(Symbol *symbol, ParsedLine parsed_line) {
     return 0;
 }
 
-int update_symbol(Symbol *symbol, ParsedLine parsed_line, int *icf, int *dcf) {
+int update_symbol(Symbol *symbol, ParsedLine parsed_line, int *icf, int *dcf, int line_number) {
     int err;
     err = check_symbol_validity(symbol, parsed_line);
     if (err != 0) {
@@ -38,6 +38,7 @@ int update_symbol(Symbol *symbol, ParsedLine parsed_line, int *icf, int *dcf) {
 
     if (parsed_line.type == DIRECTIVE_ENTRY) {
         symbol->is_entry = 1;
+        symbol->entry_line = line_number;
     }
     else if (parsed_line.type == DIRECTIVE_EXTERN) {
         symbol->is_external = 1;
@@ -81,6 +82,7 @@ Symbol *create_new_symbol(Symbol *new_symbol, char *symbol_name, Symbol **symbol
     new_symbol->is_data = 0;
     new_symbol->is_external = 0;
     new_symbol->is_entry = 0;
+    new_symbol->entry_line = 0;
     new_symbol->value = 0;
     new_symbol->next = NULL;
     strcpy(new_symbol->name, symbol_name);
@@ -100,15 +102,35 @@ void update_all_data_symbols(Symbol *symbols, int icf) {
     }
 }
 
-int create_symbol(ParsedLine parsed_line, Symbol **symbols, int *icf, int *dcf) {
+/* Checks the name .entry and .extern got as their operand, the parser did not
+   check it. Returns 0 when the name is legal, or the code of the error */
+static int validate_entry_extern_symbol_operand(char *name) {
+    if (name[0] == '\0') {
+        return ERROR_MISSING_OPERANDS;
+    }
+
+    if (strlen(name) > MAX_LABEL_LENGTH) {
+        return ERROR_LABEL_TOO_LONG;
+    }
+
+    return validate_label(name);
+}
+
+int create_symbol(ParsedLine parsed_line, Symbol **symbols, int *icf, int *dcf, int line_number) {
     int err;
     char *symbol_name;
     Symbol *symbol;
 
     symbol_name = get_symbol_name(&parsed_line);
 
+    if (parsed_line.type == DIRECTIVE_ENTRY || parsed_line.type == DIRECTIVE_EXTERN) {
+        err = validate_entry_extern_symbol_operand(symbol_name);
+        if (err != 0) {
+            return err;
+        }
+    }
     /* this line gives no name to the table, like an instruction with no label */
-    if (symbol_name[0] == '\0') {
+    else if (symbol_name[0] == '\0') {
         return 0;
     }
     
@@ -121,9 +143,37 @@ int create_symbol(ParsedLine parsed_line, Symbol **symbols, int *icf, int *dcf) 
         symbol = create_new_symbol(new_symbol, symbol_name, symbols);
     }
     
-    err = update_symbol(symbol, parsed_line, icf, dcf);
+    err = update_symbol(symbol, parsed_line, icf, dcf, line_number);
     if (err != 0) {
         return err;
     }
     return 0;
+}
+
+int check_all_entries_defined(Symbol *symbols, char *filename) {
+    Symbol *current;
+    int no_errors = 1;
+
+    for (current = symbols; current != NULL; current = current->next) {
+        /* a symbol that only got a .entry and was never given an address */
+        if (current->is_entry && !current->is_code && !current->is_data) {
+            print_error(ERROR_ENTRY_NOT_DEFINED, filename, current->entry_line);
+            no_errors = 0;
+        }
+    }
+
+    return no_errors;
+}
+
+void free_symbols_table(Symbol **symbols) {
+    Symbol *current = *symbols;
+    Symbol *next;
+
+    while (current != NULL) {
+        next = current->next;
+        free(current);
+        current = next;
+    }
+
+    *symbols = NULL;
 }

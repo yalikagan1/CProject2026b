@@ -3,6 +3,7 @@
 #define FIRST_PASS_H
 
 #include "globals.h"
+#include "grammar.h"
 
 /* Runs the first pass over the .am file: fills the symbol table, the data
    image and the code image, and returns the final IC and DC through icf and dcf. 

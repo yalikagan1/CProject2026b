@@ -24,6 +24,10 @@ static Error errors[] = {
     {ERROR_SYMBOL_ENTRY_AND_EXTERN,  "Symbol can't be both an entry and an external"},
     {ERROR_TOO_MANY_OPERANDS,  "Too many operands for the operation"},
     {ERROR_TOO_FEW_OPERANDS,  "Too few operands for the operation"},
+    {ERROR_INVALID_OPERAND,  "Operand is not of the kind the operation expects"},
+    {ERROR_INVALID_FORMAT,  "Unknown operand format for the operation"},
+    {ERROR_ENTRY_NOT_DEFINED,  "Symbol of .entry is never defined in this file"},
+    {ERROR_UNKNOWN_OPERATION,  "Unknown operation name"}
 };
 
 /* Returns text of this error code. */

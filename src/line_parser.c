@@ -18,27 +18,6 @@ static int word_length(char *str) {
     return len;
 }
 
-/* Checks a label name that was already cut out of the line, without its colon.
-   Returns 0 when the name is legal, or the code of the error */
-static int validate_label(char *label) {
-    int i;
-
-    if (!isalpha((unsigned char)label[0])) {
-        return ERROR_INVALID_LABEL_NAME;
-    }
-
-    for (i = 1; label[i] != '\0'; i++) {
-        if (!isalnum((unsigned char)label[i])) {
-            return ERROR_INVALID_LABEL_NAME;
-        }
-    }
-
-    if (is_reserved_word(label)) {
-        return ERROR_LABEL_IS_RESERVED_WORD;
-    }
-
-    return 0;
-}
 
 int parse_line(char *line, ParsedLine *parsed) {
     int word_len;

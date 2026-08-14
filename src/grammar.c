@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include "grammar.h"
 #include "globals.h"
+#include "error_handle.h"
 
 static const Operation OPERATIONS[OPERATIONS_AMOUNT] = {
     {"add",   0,  1, INST_TYPE_R, OP_FORMAT_RRR,   3, NULL, NULL, NULL},
@@ -137,4 +139,26 @@ int is_number(char *str) {
     strtol(str, &end, 10);
 
     return *end == '\0';
+}
+
+/* Checks a label name that was already cut out of the line, without its colon.
+   Returns 0 when the name is legal, or the code of the error */
+int validate_label(char *label) {
+    int i;
+
+    if (!isalpha((unsigned char)label[0])) {
+        return ERROR_INVALID_LABEL_NAME;
+    }
+
+    for (i = 1; label[i] != '\0'; i++) {
+        if (!isalnum((unsigned char)label[i])) {
+            return ERROR_INVALID_LABEL_NAME;
+        }
+    }
+
+    if (is_reserved_word(label)) {
+        return ERROR_LABEL_IS_RESERVED_WORD;
+    }
+
+    return 0;
 }

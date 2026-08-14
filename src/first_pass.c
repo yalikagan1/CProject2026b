@@ -55,7 +55,7 @@ int first_pass(char *am_filename, Symbol **symbols, CodeImage **code, DataImage 
             no_errors = 0;
             continue;
         }
-        err = create_symbol(parsed_line, symbols, &IC, &DC);
+        err = create_symbol(parsed_line, symbols, &IC, &DC, line_number);
         if (err) {
             print_error(err, am_filename, line_number);
             no_errors = 0;
@@ -90,6 +90,10 @@ int first_pass(char *am_filename, Symbol **symbols, CodeImage **code, DataImage 
     *dcf = DC;
 
     update_all_data_symbols(*symbols, IC);
+
+    if (!check_all_entries_defined(*symbols, am_filename)) {
+        no_errors = 0;
+    }
 
     return no_errors;
 }

@@ -49,6 +49,7 @@ typedef struct Symbol {
     int is_data;
     int is_external;
     int is_entry;
+    int entry_line; /* the line of the .entry, to report an entry that was never defined */
     struct Symbol *next;
 } Symbol;
 
@@ -100,5 +101,9 @@ int is_operand_external(char *operand, Symbol *s);
  * @return 1 if number, 0 if not.
  */
 int is_number(char *str);
+
+/* Checks a label name that was already cut out of the line, without its colon.
+   Returns 0 when the name is legal, or the code of the error */
+int validate_label(char *label);
 
 #endif

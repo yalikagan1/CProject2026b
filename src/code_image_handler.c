@@ -2,8 +2,51 @@
 #include "code_image_handler.h"
 #include "line_parser.h"
 #include "grammar.h"
+#include "helpers.h"
 #include <string.h>
 #include <stdlib.h>
+
+static int validate_operands(char *arg1, char *arg2, char *arg3, Operation *operation) {
+    switch (operation->format) {
+        case OP_FORMAT_RRR:
+            if (parse_register(arg1) == -1 || parse_register(arg2) == -1 || parse_register(arg3) == -1) {
+                return ERROR_INVALID_OPERAND;
+            }
+            break;
+        case OP_FORMAT_RR:
+            if (parse_register(arg1) == -1 || parse_register(arg2) == -1) {
+                return ERROR_INVALID_OPERAND;
+            }
+            break;
+        case OP_FORMAT_RIR:
+            if (parse_register(arg1) == -1 || !is_number(arg2) || parse_register(arg3) == -1) {
+                return ERROR_INVALID_OPERAND;
+            }
+            break;
+        case OP_FORMAT_RRL:
+            if (parse_register(arg1) == -1 || parse_register(arg2) == -1 || validate_label(arg3) != 0) {
+                return ERROR_INVALID_OPERAND;
+            }
+            break;
+        case OP_FORMAT_JUMP:
+            /* jmp takes a label or a register */
+            if (parse_register(arg1) == -1 && validate_label(arg1) != 0) {
+                return ERROR_INVALID_OPERAND;
+            }
+            break;
+        case OP_FORMAT_LABEL:
+            if (validate_label(arg1) != 0) {
+                return ERROR_INVALID_OPERAND;
+            }
+            break;
+        case OP_FORMAT_NONE: /* hlt has no operands */
+            break;
+        default:
+            return ERROR_INVALID_FORMAT;
+    }
+
+    return 0;
+}
 
 static void add_node_to_code_image_at_the_end(CodeImage *node, CodeImage **code) {
     CodeImage *last_node;
@@ -39,6 +82,29 @@ static char *copy_argument(char *token) {
     return copy;
 }
 
+static int commas_validation(char *operands) {
+    char *text = skip_spaces(operands);
+
+    /* the list may not open with a comma */
+    if (*text == ',') {
+        return ERROR_INVALID_COMMAS;
+    }
+
+    while (*text != '\0') {
+        if (*text == ',') {
+            text = skip_spaces(text + 1);
+            /* after a comma there has to be another operand */
+            if (*text == '\0' || *text == ',') {
+                return ERROR_INVALID_COMMAS;
+            }
+        }
+        else {
+            text++;
+        }
+    }
+    return 0;
+}
+
 int extract_and_assume_arguments(char *operands, Operation *operation) {
     char *token;
     char *delimiter = ",";
@@ -47,9 +113,16 @@ int extract_and_assume_arguments(char *operands, Operation *operation) {
     char *arg2 = NULL;
     char *arg3 = NULL;
     char *copy;
+    int err;
+
+    err = commas_validation(operands);
+    if (err) {
+        return err;
+    }
 
     token = strtok(operands, delimiter);
     while (token != NULL) {
+        token = trim_whitespaces(token);
         count++;
         if (count > operation->arg_num) {
             free_all_arguments(arg1, arg2, arg3);
@@ -95,7 +168,7 @@ int add_instruction(ParsedLine parsed_line, CodeImage **code, int ic) {
     Operation new_operation;
 
     if (operation == NULL) {
-        return ERROR_MISSING_OPERATION;
+        return ERROR_UNKNOWN_OPERATION;
     }
 
     new_operation.name = operation->name;
@@ -109,11 +182,18 @@ int add_instruction(ParsedLine parsed_line, CodeImage **code, int ic) {
         return err;
     }
 
+    err = validate_operands(new_operation.arg1, new_operation.arg2, new_operation.arg3, &new_operation);
+    if (err) {
+        free_all_arguments(new_operation.arg1, new_operation.arg2, new_operation.arg3);
+        return err;
+    }
+
     node = (CodeImage *)malloc(sizeof(CodeImage));
     if (node == NULL) {
         free_all_arguments(new_operation.arg1, new_operation.arg2, new_operation.arg3);
         return ERROR_MEMORY_ALLOCATION_FAILED;
     }
+
     node->operation = new_operation;
     node->current_ic = ic;
     node->next = NULL;
@@ -121,4 +201,19 @@ int add_instruction(ParsedLine parsed_line, CodeImage **code, int ic) {
     add_node_to_code_image_at_the_end(node, code);
 
     return 0;
+}
+
+void free_code_image(CodeImage **code) {
+    CodeImage *current = *code;
+    CodeImage *next;
+
+    while (current != NULL) {
+        next = current->next;
+        free_all_arguments(current->operation.arg1, current->operation.arg2,
+                           current->operation.arg3);
+        free(current);
+        current = next;
+    }
+
+    *code = NULL;
 }
