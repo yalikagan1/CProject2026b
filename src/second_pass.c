@@ -6,8 +6,7 @@
 #include "helpers.h"
 #include "symbols_table_handler.h"
 
-/* Returns the operand that has to be a label, or NULL when the operation
-   takes no label at all */
+
 static char *label_operand(Operation op) {
     if(op.format == OP_FORMAT_RRL) {
         return op.arg3;
@@ -15,26 +14,36 @@ static char *label_operand(Operation op) {
     if(op.format == OP_FORMAT_LABEL) {
         return op.arg1;
     }
-    /* jmp takes a label only when it did not get a register */
+
     if(op.format == OP_FORMAT_JUMP && parse_register(op.arg1) == -1) {
         return op.arg1;
     }
     return NULL;
 }
 
-/* Reports every instruction that names a label no line ever defined.
-   Returns 1 when all the labels are fine, 0 when at least one is not */
 static int check_all_labels_defined(CodeImage *code, Symbol *symbols, char *filepath) {
     char *am_filename = add_file_extention(filepath, ".am");
     CodeImage *current;
+    Symbol *target;
     char *label;
     int no_errors = 1;
 
     for(current = code; current != NULL; current = current->next) {
         label = label_operand(current->operation);
+        if(label == NULL) {
+            continue;
+        }
 
-        if(label != NULL && find_symbol(label, &symbols) == NULL) {
+        target = find_symbol(label, &symbols);
+
+        if(target == NULL) {
             print_error(ERROR_UNDEFINED_SYMBOL, am_filename, current->line_number);
+            no_errors = 0;
+        }
+        /* the immediate of a branch is a distance from here to the label, and
+           there is no distance to a label that lives in another file */
+        else if(current->operation.format == OP_FORMAT_RRL && target->is_external) {
+            print_error(ERROR_EXTERNAL_BRANCH_TARGET, am_filename, current->line_number);
             no_errors = 0;
         }
     }
@@ -53,8 +62,6 @@ int second_pass(char *am_filename, Symbol *symbols, CodeImage *code,
     FILE *file_write;
     CodeImage *current;
 
-    /* checked before anything is opened, so a file with an undefined symbol
-       leaves no output behind */
     if(!check_all_labels_defined(code, symbols, am_filename)) {
         return -1;
     }

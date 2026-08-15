@@ -2,6 +2,8 @@
 ; Exercises the pre-assembler: several macros, several invocations of each,
 ; a single-line macro body, and a macro invoked with surrounding whitespace.
 ; The resulting .am must contain no mcro/mcroend lines at all.
+; The names carry an underscore on purpose: a macro name allows one even though
+; a label does not.
 .entry MAIN
 .extern EXTVAL
 

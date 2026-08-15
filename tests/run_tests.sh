@@ -125,6 +125,22 @@ for src in "$INVALID_DIR"/*.as; do
         bad "$name produced no error output at all"
     fi
 
+    # Reporting "some error" is not enough: a file that fails at the wrong stage,
+    # or for a reason the case was not written to test, would pass that way. The
+    # .errors golden holds one "line code" pair per expected error, in the order
+    # the assembler reports them.
+    want_err="$EXPECTED_DIR/$name.errors"
+    if [ -f "$want_err" ]; then
+        sed -n 's/^#### ERROR #\([0-9][0-9]*\).*line \([0-9][0-9]*\) .*$/\2 \1/p' \
+            "$OUT_DIR/$name.stdout" > "$OUT_DIR/$name.errors"
+        if diff -u "$want_err" "$OUT_DIR/$name.errors" > "$OUT_DIR/$name.errors.diff"; then
+            ok "$name reported exactly the expected errors"
+        else
+            bad "$name reported different errors than expected"
+            head -30 "$OUT_DIR/$name.errors.diff"
+        fi
+    fi
+
     leftovers=""
     for ext in ob ent ext; do
         [ -f "$OUT_DIR/$name.$ext" ] && leftovers="$leftovers .$ext"

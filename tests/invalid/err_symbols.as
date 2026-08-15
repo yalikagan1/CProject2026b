@@ -30,5 +30,7 @@ LOCAL:  hlt
 .entry 5
 
 ; --- .entry for a symbol that is never defined in this file ---
-.entry NEVER_DEFINED
+; the name holds no underscore on purpose, or it would be rejected as a bad
+; label name and this case would never reach the check it is here to exercise
+.entry NEVERDEFINED
         hlt

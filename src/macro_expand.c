@@ -1,18 +1,46 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include "macro_expand.h"
 #include "macros_linked_list.h"
 #include "error_handle.h"
 #include "helpers.h"
 #include "grammar.h"
 
+/* A macro name opens with a letter and carries letters, digits and underscores.
+   The underscore is the one way it is freer than a label. It may not be the name
+   of an operation or of a directive, or a line that uses it would read like a
+   line of code */
+static int is_legal_macro_name(char *name) {
+    int i;
+
+    if(!isalpha((unsigned char)name[0])) {
+        return 0;
+    }
+
+    for(i = 1; name[i] != '\0'; i++) {
+        if(!isalnum((unsigned char)name[i]) && name[i] != '_') {
+            return 0;
+        }
+    }
+
+    return !is_reserved_word(name);
+}
+
 int validate_macro_name(char *macro_name, char *filename, int line_counter) {
+    if(macro_name == NULL) {
+        print_error(ERROR_MISSING_MACRO_NAME, filename, line_counter);
+        return 1;
+    }
+
     macro_name[strcspn(macro_name, "\n")] = '\0';
-    if(is_reserved_word(macro_name)) {
+
+    if(strlen(macro_name) > MAX_LABEL_LENGTH || !is_legal_macro_name(macro_name)) {
         print_error(ERROR_INVALID_MACRO_NAME, filename, line_counter);
         return 1;
     }
+
     return 0;
 }
 
@@ -47,8 +75,24 @@ int main_macro_expand(char *filepath) {
 
             /* get first word in line */
             first_word = strtok(temp_line, " ");
+
+            /* a line that holds nothing but separators has no first word */
+            if(first_word == NULL) {
+                fprintf(file_write, "%s", line);
+                continue;
+            }
+
+            /* the newline is in the way of every comparison below */
+            first_word[strcspn(first_word, "\n")] = '\0';
+
             if(is_macro) {
-                if(strcmp(first_word, "mcroend\n") == 0) {
+                if(strcmp(first_word, "mcroend") == 0) {
+                    /* nothing may share the line that closes a macro */
+                    if(strtok(NULL, "") != NULL) {
+                        print_error(ERROR_EXTRA_CHARS_AFTER_MACRO, filename, line_counter);
+                        found_error = 1;
+                    }
+
                     is_macro = 0;
                     temp_node->macro_content = current_mcro_txt;
                     current_mcro_txt = NULL;
@@ -65,8 +109,13 @@ int main_macro_expand(char *filepath) {
                 if(strcmp(first_word, "mcro") == 0) {
                     is_macro = 1;
 
-                    mcr_name = strtok(NULL, "");
+                    mcr_name = strtok(NULL, " ");
                     found_error += validate_macro_name(mcr_name, filename, line_counter);
+
+                    if(mcr_name == NULL) {
+                        mcr_name = "";
+                    }
+
                     dynamic_mcr_name = malloc(strlen(mcr_name) + 1);
                     strcpy(dynamic_mcr_name, mcr_name);
 
@@ -80,8 +129,7 @@ int main_macro_expand(char *filepath) {
                         found_error = 1;
                     }
                 } else {
-                    first_word[strcspn(first_word, "\n")] = '\0';
-                    current_mcro_txt = is_in_list(head, first_word);
+                    current_mcro_txt = (*first_word == '\0') ? NULL : is_in_list(head, first_word);
                     if(current_mcro_txt) { /* Found macro used */
                         fprintf(file_write, "%s", current_mcro_txt);
                     } else {              

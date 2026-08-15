@@ -20,4 +20,9 @@
 
 #define MAX_REGISTER 31
 
+/* The immediate of an I type instruction is a signed field of 16 bits */
+#define MIN_IMMEDIATE (-32768L)
+
+#define MAX_IMMEDIATE 32767L
+
 #endif

@@ -54,3 +54,6 @@ dkms.conf
 *.dwo
 
 /assembler
+
+/tests/actual/
+/tests/build.log

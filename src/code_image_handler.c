@@ -3,8 +3,15 @@
 #include "line_parser.h"
 #include "grammar.h"
 #include "helpers.h"
+#include "globals.h"
 #include <string.h>
 #include <stdlib.h>
+
+static int is_immediate_in_range(char *arg) {
+    long value = strtol(arg, NULL, 10);
+
+    return value >= MIN_IMMEDIATE && value <= MAX_IMMEDIATE;
+}
 
 static int validate_operands(char *arg1, char *arg2, char *arg3, Operation *operation) {
     switch (operation->format) {
@@ -21,6 +28,9 @@ static int validate_operands(char *arg1, char *arg2, char *arg3, Operation *oper
         case OP_FORMAT_RIR:
             if (parse_register(arg1) == -1 || !is_number(arg2) || parse_register(arg3) == -1) {
                 return ERROR_INVALID_OPERAND;
+            }
+            if (!is_immediate_in_range(arg2)) {
+                return ERROR_IMMEDIATE_OUT_OF_RANGE;
             }
             break;
         case OP_FORMAT_RRL:

@@ -28,7 +28,10 @@ static Error errors[] = {
     {ERROR_INVALID_FORMAT,  "Unknown operand format for the operation"},
     {ERROR_ENTRY_NOT_DEFINED,  "Symbol of .entry is never defined in this file"},
     {ERROR_UNKNOWN_OPERATION,  "Unknown operation name"},
-    {ERROR_UNDEFINED_SYMBOL,  "Operand is a symbol that is not defined in this file"}
+    {ERROR_UNDEFINED_SYMBOL,  "Operand is a symbol that is not defined in this file"},
+    {ERROR_EXTERNAL_BRANCH_TARGET,  "A conditional branch may not target an external symbol"},
+    {ERROR_IMMEDIATE_OUT_OF_RANGE,  "Immediate value does not fit in the 16 bits of the field"},
+    {ERROR_MISSING_MACRO_NAME,  "The mcro line does not give the macro a name"}
 };
 
 /* Returns text of this error code. */
