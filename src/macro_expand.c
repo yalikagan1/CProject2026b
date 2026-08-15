@@ -8,10 +8,6 @@
 #include "helpers.h"
 #include "grammar.h"
 
-/* A macro name opens with a letter and carries letters, digits and underscores.
-   The underscore is the one way it is freer than a label. It may not be the name
-   of an operation or of a directive, or a line that uses it would read like a
-   line of code */
 static int is_legal_macro_name(char *name) {
     int i;
 
