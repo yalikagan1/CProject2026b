@@ -7,17 +7,12 @@
 
 void remove_tabs(char *str)
 {
-    char *src = str;
-    char *dst = str;
-
-    while (*src) {
-        if (*src != '\t') {
-            *dst++ = *src;
+    while (*str) {
+        if (*str == '\t') {
+            *str = ' ';
         }
-        src++;
+        str++;
     }
-
-    *dst = '\0';
 }
 
 void remove_extra_whitespaces(char *str) {
@@ -31,11 +26,18 @@ void remove_extra_whitespaces(char *str) {
     str[j] = '\0';
 }
 
-int check_line_length(char *line, char *filename, int line_counter) {
-    int ret_val = strchr(line, '\n') == NULL;
-    if(ret_val)
-        print_error(ERROR_TOO_LONG_LINE, filename, line_counter);
-    return ret_val;
+int check_line_length(char *line, FILE *file, char *filename, int line_counter) {
+    if(check_if_line_is_ended(line)) {
+        return 0;
+    }
+
+    /* a line with no newline can also be the last line of the file */
+    if(!remove_rest_of_line(file)) {
+        return 0;
+    }
+
+    print_error(ERROR_TOO_LONG_LINE, filename, line_counter);
+    return 1;
 }
 
 char *skip_spaces(char *str) {
@@ -86,7 +88,7 @@ int remove_rest_of_line(FILE *file) {
 }
 
 char * add_file_extention(char *filepath, char *ext) {
-    char *filename = malloc(strlen(filepath) + strlen(ext));
+    char *filename = malloc(strlen(filepath) + strlen(ext) + 1);
     strcpy(filename, filepath);
     strcat(filename, ext);
     return filename;

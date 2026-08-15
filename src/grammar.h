@@ -56,6 +56,7 @@ typedef struct Symbol {
 
 typedef struct CodeImage {
     int current_ic;
+    int line_number;
     Operation operation;
     struct CodeImage *next;
 } CodeImage;

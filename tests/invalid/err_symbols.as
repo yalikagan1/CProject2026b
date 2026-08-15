@@ -1,0 +1,34 @@
+; err_symbols.as
+; Label and symbol-table errors. Every line below is wrong for a different
+; reason. Expected: one error per line, all reported, no output files.
+
+; --- illegal label names ---
+1abc:   hlt
+my_label: hlt
+add:    hlt
+asciz:  hlt
+Abcdefghijklmnopqrstuvwxyz012345: hlt
+LBL :   hlt
+
+; --- duplicate definition ---
+DUP:    hlt
+DUP:    hlt
+
+; --- entry / extern conflicts ---
+.entry BOTH
+.extern BOTH
+BOTH:   hlt
+
+; --- a local label that is also declared external ---
+.extern LOCAL
+LOCAL:  hlt
+
+; --- malformed .entry / .extern ---
+.entry
+.extern
+.entry A, B
+.entry 5
+
+; --- .entry for a symbol that is never defined in this file ---
+.entry NEVER_DEFINED
+        hlt

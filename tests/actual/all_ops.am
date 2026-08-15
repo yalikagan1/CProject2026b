@@ -1,0 +1,63 @@
+; all_ops.as
+; Exercises every one of the 27 operations and every directive at least once,
+; including the boundary values of each data type and of the immediate field.
+; The booklet requires a demonstration of "the variety of operations and data
+; types of the assembly language".
+.entry START
+.entry NUMS
+.extern EXT1
+.extern EXT2
+
+; --- R type, arithmetic and logic: op $rs, $rt, $rd ---
+START: add $3, $5, $9
+sub $1, $2, $3
+and $4, $5, $6
+or $1, $2, $1
+nor $31, $0, $15
+
+; --- R type, copy: op $rd, $rs ---
+move $20, $4
+mvhi $7, $8
+mvlo $9, $10
+
+; --- I type, arithmetic and logic: op $rs, immed, $rt ---
+addi $9, -45, $8
+subi $1, 32767, $2
+andi $3, -32768, $4
+ori $9, -5, $2
+nori $5, +7, $6
+
+; --- I type, load and store: op $rs, offset, $rt ---
+LOOP: lb $1, 0, $2
+sb $1, -1, $2
+lw $9, 34, $2
+sw $7, -28, $18
+lh $9, 34, $2
+sh $0, 1, $31
+
+; --- I type, conditional branch: op $rs, $rt, label ---
+bne $31, $9, LOOP
+beq $1, $2, LOOP
+blt $5, $24, END
+bgt $4, $2, END
+
+; --- J type ---
+jmp LOOP
+jmp $4
+la NUMS
+la EXT1
+call START
+call EXT2
+END: hlt
+
+; --- directives, with the boundary value of every data type ---
+NUMS: .db 7, -57, 17, +9
+BYTES: .db 127, -128
+HALVES: .dh 0, 1700, 3, -1
+LIMITS: .dh 32767, -32768
+WORDS: .dw 120056
+BIG: .dw 2147483647
+NEG: .dw -2147483648
+TEXT: .asciz "aBcd"
+EMPTY: .asciz ""
+SPACED: .asciz " hello world "

@@ -14,5 +14,6 @@ int validate_macro_name(char *macro_name, char *filename, int line_counter);
  *
  * This function expand all macros in input file and creates .am file as output..
  * @param filename name of the input file.
+ * @return 0 if valid, 1 if not valid.
  */
-void main_macro_expand(char *filename);
+int main_macro_expand(char *filename);

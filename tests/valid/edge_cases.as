@@ -1,0 +1,34 @@
+; edge_cases.as
+; Everything the booklet declares legal but that is easy to get wrong.
+;   - a comment line that does not start in column 1
+;   - blank lines and lines of pure whitespace
+;   - unlimited whitespace around commas, after the operation name and at
+;     the end of the line
+;   - a 1-character label and a 31-character label
+;   - upper/lower case labels that differ only by case
+;   - a label whose name is a reserved word in a different case
+;   - the same register used as more than one operand
+;   - a forward reference and a backward reference
+;   - .entry and .extern each declared more than once (not an error)
+;   - a label on an .entry line (meaningless, must be ignored, not an error)
+   ; this comment does not start in column 1
+
+.entry FWD
+.entry FWD
+.extern EXT
+.extern EXT
+
+x:      hlt
+Abcdefghijklmnopqrstuvwxyz01234: hlt
+hEllo:  hlt
+HELLO:  hlt
+Add:    hlt
+ASCiz:  hlt
+
+BACK:	add	$1,	$2,	$3
+        or   $1 , $2 , $1
+        jmp     FWD
+        beq     $1, $2, BACK
+FWD:    la      EXT
+IGNORED: .entry FWD
+        hlt

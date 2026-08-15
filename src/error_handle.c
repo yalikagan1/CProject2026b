@@ -27,7 +27,8 @@ static Error errors[] = {
     {ERROR_INVALID_OPERAND,  "Operand is not of the kind the operation expects"},
     {ERROR_INVALID_FORMAT,  "Unknown operand format for the operation"},
     {ERROR_ENTRY_NOT_DEFINED,  "Symbol of .entry is never defined in this file"},
-    {ERROR_UNKNOWN_OPERATION,  "Unknown operation name"}
+    {ERROR_UNKNOWN_OPERATION,  "Unknown operation name"},
+    {ERROR_UNDEFINED_SYMBOL,  "Operand is a symbol that is not defined in this file"}
 };
 
 /* Returns text of this error code. */

@@ -74,7 +74,7 @@ int first_pass(char *am_filename, Symbol **symbols, CodeImage **code, DataImage 
             DC = data->count;
         }
         else if (parsed_line.type == DIRECTIVE_NONE) {
-            err = add_instruction(parsed_line, code, IC);
+            err = add_instruction(parsed_line, code, IC, line_number);
             if (err) {
                 print_error(err, am_filename, line_number);
                 no_errors = 0;

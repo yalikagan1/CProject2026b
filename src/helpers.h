@@ -22,13 +22,16 @@ void remove_extra_whitespaces(char *str);
 /**
  * @brief validate line length.
  *
- * This function validate line length according to assembler rules.
- * @param macro_name string line text.
+ * This function validate line length according to assembler rules. A line that
+ * is too long is thrown away up to its end, so the reading goes on from the
+ * next line.
+ * @param line string line text.
+ * @param file the file the line was read from.
  * @param filename name of the input file.
  * @param line_counter number of line in the input file.
  * @return 0 if valid, 1 if not valid.
  */
-int check_line_length(char *line, char *filename, int line_counter);
+int check_line_length(char *line, FILE *file, char *filename, int line_counter);
 
 /**
  * @brief add extension to file.

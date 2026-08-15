@@ -1,0 +1,13 @@
+gcc -Wall -Wextra -ansi -pedantic -Iinclude -c src/first_pass.c -o build/first_pass.o
+gcc -Wall -Wextra -ansi -pedantic -Iinclude -c src/line_parser.c -o build/line_parser.o
+gcc -Wall -Wextra -ansi -pedantic -Iinclude -c src/grammar.c -o build/grammar.o
+gcc -Wall -Wextra -ansi -pedantic -Iinclude -c src/code_image_handler.c -o build/code_image_handler.o
+gcc -Wall -Wextra -ansi -pedantic -Iinclude -c src/helpers.c -o build/helpers.o
+gcc -Wall -Wextra -ansi -pedantic -Iinclude -c src/second_pass.c -o build/second_pass.o
+gcc -Wall -Wextra -ansi -pedantic -Iinclude -c src/error_handle.c -o build/error_handle.o
+gcc -Wall -Wextra -ansi -pedantic -Iinclude -c src/main.c -o build/main.o
+gcc -Wall -Wextra -ansi -pedantic -Iinclude -c src/symbols_table_handler.c -o build/symbols_table_handler.o
+gcc -Wall -Wextra -ansi -pedantic -Iinclude -c src/macros_linked_list.c -o build/macros_linked_list.o
+gcc -Wall -Wextra -ansi -pedantic -Iinclude -c src/macro_expand.c -o build/macro_expand.o
+gcc -Wall -Wextra -ansi -pedantic -Iinclude -c src/data_image_handler.c -o build/data_image_handler.o
+gcc build/first_pass.o build/line_parser.o build/grammar.o build/code_image_handler.o build/helpers.o build/second_pass.o build/error_handle.o build/main.o build/symbols_table_handler.o build/macros_linked_list.o build/macro_expand.o build/data_image_handler.o -o assembler

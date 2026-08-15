@@ -161,7 +161,7 @@ int extract_and_assume_arguments(char *operands, Operation *operation) {
     return 0;
 }
 
-int add_instruction(ParsedLine parsed_line, CodeImage **code, int ic) {
+int add_instruction(ParsedLine parsed_line, CodeImage **code, int ic, int line_number) {
     int err;
     CodeImage *node;
     const Operation *operation = find_operation(parsed_line.name);
@@ -196,6 +196,7 @@ int add_instruction(ParsedLine parsed_line, CodeImage **code, int ic) {
 
     node->operation = new_operation;
     node->current_ic = ic;
+    node->line_number = line_number;
     node->next = NULL;
 
     add_node_to_code_image_at_the_end(node, code);

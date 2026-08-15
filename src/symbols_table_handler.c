@@ -5,6 +5,16 @@
 #include "grammar.h"
 #include "error_handle.h"
 
+int add_symbol_to_end(Symbol *symbol, Symbol **symbols) {
+    Symbol *last;
+    last = *symbols;
+    while (last->next != NULL) {
+        last = last->next;
+    }
+    last->next = symbol;
+    return 0;
+}
+
 int check_symbol_validity(Symbol *symbol, ParsedLine parsed_line) {
     if (parsed_line.type == DIRECTIVE_ENTRY) {
         if (symbol->is_external) { /* if the symbol is external, it cannot be an entry */
@@ -87,8 +97,13 @@ Symbol *create_new_symbol(Symbol *new_symbol, char *symbol_name, Symbol **symbol
     new_symbol->next = NULL;
     strcpy(new_symbol->name, symbol_name);
 
-    new_symbol->next = *symbols;
-    *symbols = new_symbol;
+    if (*symbols == NULL) {
+        *symbols = new_symbol;
+    }
+    else {
+        add_symbol_to_end(new_symbol, symbols);
+    }
+
     return new_symbol;
 }
 

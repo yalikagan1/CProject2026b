@@ -4,49 +4,107 @@
 #include "second_pass.h"
 #include "error_handle.h"
 #include "helpers.h"
+#include "symbols_table_handler.h"
+
+/* Returns the operand that has to be a label, or NULL when the operation
+   takes no label at all */
+static char *label_operand(Operation op) {
+    if(op.format == OP_FORMAT_RRL) {
+        return op.arg3;
+    }
+    if(op.format == OP_FORMAT_LABEL) {
+        return op.arg1;
+    }
+    /* jmp takes a label only when it did not get a register */
+    if(op.format == OP_FORMAT_JUMP && parse_register(op.arg1) == -1) {
+        return op.arg1;
+    }
+    return NULL;
+}
+
+/* Reports every instruction that names a label no line ever defined.
+   Returns 1 when all the labels are fine, 0 when at least one is not */
+static int check_all_labels_defined(CodeImage *code, Symbol *symbols, char *filepath) {
+    char *am_filename = add_file_extention(filepath, ".am");
+    CodeImage *current;
+    char *label;
+    int no_errors = 1;
+
+    for(current = code; current != NULL; current = current->next) {
+        label = label_operand(current->operation);
+
+        if(label != NULL && find_symbol(label, &symbols) == NULL) {
+            print_error(ERROR_UNDEFINED_SYMBOL, am_filename, current->line_number);
+            no_errors = 0;
+        }
+    }
+
+    free(am_filename);
+    return no_errors;
+}
 
 int second_pass(char *am_filename, Symbol *symbols, CodeImage *code,
     DataImage *data, int *icf, int *dcf) {
     char* output_file = NULL;
-    char hex_str[12];
+    char hex_str[13];
     Operation op;
-    int binary_code, i, current_counter;
+    unsigned int binary_code;
+    int i, current_counter;
     FILE *file_write;
+    CodeImage *current;
 
-    output_file = add_file_extention(am_filename, ".ent");
+    /* checked before anything is opened, so a file with an undefined symbol
+       leaves no output behind */
+    if(!check_all_labels_defined(code, symbols, am_filename)) {
+        return -1;
+    }
+
+    output_file = add_file_extention(am_filename, ".ob");
     file_write = fopen(output_file, "w");
 
     if(file_write == NULL) {
-        print_error(ERROR_OPEN_FILE, am_filename, 0);
+        print_error(ERROR_OPEN_FILE, output_file, 0);
+        free(output_file);
         return -1;
     }
 
     /* write file header (ICF DCF)*/
-    fprintf(file_write, "     %d ", *icf);
+    fprintf(file_write, "     %d ", *icf - INITIAL_IC);
     fprintf(file_write, "%d\n", *dcf);
  
-    /* write code image (instructions) */
-    while(code != NULL) {
-        op = code->operation;
-        current_counter = code->current_ic;
+    /* write code image (instructions), code itself stays on the head of the
+       list because write_externals needs it later */
+    current = code;
+    while(current != NULL) {
+        op = current->operation;
+        current_counter = current->current_ic;
         binary_code = create_binary_code(op, symbols, current_counter);
         int_to_hex(binary_code, hex_str);
         fprintf(file_write, "%04d ", current_counter);
         fprintf(file_write, "%s\n", hex_str);
+        current = current->next;
     }
+
+    current_counter = *icf - 4;
 
     /* write data image */
     for(i = 0; i < data->count; i++) {
         if(i%4 == 0) {
             current_counter += 4;
-            fprintf(file_write, "%04d ", current_counter);
+            fprintf(file_write, "%04d", current_counter);
         }
-        fprintf(file_write, "%02X ", (unsigned char)data->bytes[i]);
+        fprintf(file_write, " %02X", (unsigned char)data->bytes[i]);
         if(i%4 == 3)
             fprintf(file_write, "\n");
     }
 
+    /* the last row of the data can hold less than four bytes */
+    if(data->count % 4 != 0) {
+        fprintf(file_write, "\n");
+    }
+
     fclose(file_write);
+    free(output_file);
     /* write .ent file */
     write_entries(am_filename, symbols);
 
@@ -59,12 +117,14 @@ void write_entries(char *am_filename, Symbol *symbols) {
     char* output_file = NULL;
     Symbol *head = symbols;
     FILE *file_write;
+    int written = 0;
 
     output_file = add_file_extention(am_filename, ".ent");
     file_write = fopen(output_file, "w");
 
     if(file_write == NULL) {
-        print_error(ERROR_OPEN_FILE, am_filename, 0);
+        print_error(ERROR_OPEN_FILE, output_file, 0);
+        free(output_file);
         return;
     }
 
@@ -72,23 +132,32 @@ void write_entries(char *am_filename, Symbol *symbols) {
         if(head->is_entry) {
             fprintf(file_write, "%s ", head->name);
             fprintf(file_write, "%04d\n", head->value);
+            written++;
         }
         head = head->next;
     }
 
     fclose(file_write);
+
+    /* a file with no entries at all does not get a .ent */
+    if(written == 0) {
+        remove(output_file);
+    }
+    free(output_file);
 }
 
 void write_externals(char *am_filename, Symbol *symbols, CodeImage *code) {
     char* output_file = NULL;
     FILE *file_write;
     Operation op;
+    int written = 0;
 
     output_file = add_file_extention(am_filename, ".ext");
     file_write = fopen(output_file, "w");
 
     if(file_write == NULL) {
-        print_error(ERROR_OPEN_FILE, am_filename, 0);
+        print_error(ERROR_OPEN_FILE, output_file, 0);
+        free(output_file);
         return;
     }
 
@@ -97,50 +166,64 @@ void write_externals(char *am_filename, Symbol *symbols, CodeImage *code) {
         if(is_operand_external(op.arg1, symbols)) {
             fprintf(file_write, "%s ", op.arg1);
             fprintf(file_write, "%04d\n", code->current_ic);
+            written++;
         }
 
         if(is_operand_external(op.arg2, symbols)) {
             fprintf(file_write, "%s ", op.arg2);
             fprintf(file_write, "%04d\n", code->current_ic);
+            written++;
         }
 
         if(is_operand_external(op.arg3, symbols)) {
             fprintf(file_write, "%s ", op.arg3);
             fprintf(file_write, "%04d\n", code->current_ic);
+            written++;
         }
         code = code->next;
     }
 
     fclose(file_write);
+
+    /* a file with no external references at all does not get a .ext */
+    if(written == 0) {
+        remove(output_file);
+    }
+    free(output_file);
 }
 
-int create_binary_code(Operation op, Symbol *s, int current_ic) {
+unsigned int create_binary_code(Operation op, Symbol *s, int current_ic) {
     if(op.type == INST_TYPE_R)
         return create_r_code(op);
     if(op.type == INST_TYPE_I)
-        return create_i_code(op, current_ic);
+        return create_i_code(op, s, current_ic);
     if(op.type == INST_TYPE_J)
         return create_j_code(op, s);
     return -1;
 }
 
-int create_r_code(Operation op) {
+unsigned int create_r_code(Operation op) {
     int rs, rt, rd;
     rs = parse_register(op.arg1);
-    rt = parse_register(op.arg2);
-    rd = parse_register(op.arg3);
 
-    if(op.opcode == 1)
+    /* the operations of opcode 1 take two registers only, and the second one
+       of them is rd and not rt */
+    if(op.opcode == 1) {
         rt = 0;
+        rd = parse_register(op.arg2);
+    } else {
+        rt = parse_register(op.arg2);
+        rd = parse_register(op.arg3);
+    }
 
-   return (op.opcode << 26) |
+   return ((unsigned int)op.opcode << 26) |
           (rs << 21) |
           (rt << 16) |
           (rd << 11) |
           (op.funct << 6);
 }
 
-int create_i_code(Operation op, int current_ic) {
+unsigned int create_i_code(Operation op, Symbol *s, int current_ic) {
     int rs, rt;
     short int imm;
     rs = parse_register(op.arg1);
@@ -149,17 +232,16 @@ int create_i_code(Operation op, int current_ic) {
         rt = parse_register(op.arg3);    
     } else {
         rt = parse_register(op.arg2); 
-        imm = (short int)atoi(op.arg3);
-        imm = imm - current_ic;
+        imm = (short int)(get_symbol_value(op.arg3, s) - current_ic);
     }
     
-   return (op.opcode << 26) |
+   return ((unsigned int)op.opcode << 26) |
           (rs << 21) |
           (rt << 16) |
           (imm & 0xFFFF);
 }
 
-int create_j_code(Operation op, Symbol *s) {
+unsigned int create_j_code(Operation op, Symbol *s) {
     int opcode, reg = 0, address = 0, temp_reg = 0;
     opcode = op.opcode;
     if(opcode == 30) {
@@ -169,13 +251,14 @@ int create_j_code(Operation op, Symbol *s) {
             address = temp_reg;
         }
     }
-    if (opcode != 63) {
+
+    if (reg == 0 && opcode != 63) {
         address = get_symbol_value(op.arg1, s);
     }
 
-    return (op.opcode << 26) |
+    return ((unsigned int)op.opcode << 26) |
     (reg << 25) |
-    (address << 24);
+    address;
 
 }
 
@@ -207,20 +290,22 @@ void print_as_binary(int num) {
     printf("\n");
 }
 
-void int_to_hex(int num, char *str) {
+void int_to_hex(unsigned int num, char *str) {
     int i, j, byte, digit;
     j = 0;
 
     for (i = 0; i < 4; i++) {
         byte = (num >> (i * 8)) & 255;
 
+        if (i > 0) {
+            str[j++] = ' ';
+        }
+
         digit = (byte >> 4) & 15;
         str[j++] = (digit < 10) ? '0' + digit : 'A' + digit - 10;
 
         digit = byte & 15;
         str[j++] = (digit < 10) ? '0' + digit : 'A' + digit - 10;
-
-        str[j++] = ' ';
     }
 
     str[j] = '\0';

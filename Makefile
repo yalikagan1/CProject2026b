@@ -7,7 +7,7 @@ CFLAGS := -Wall -Wextra -ansi -pedantic -Iinclude
 # Directories
 SRC_DIR := src
 BUILD_DIR := build
-TARGET := program
+TARGET := assembler
 
 # Find all source files recursively
 SRCS := $(shell find $(SRC_DIR) -name "*.c")

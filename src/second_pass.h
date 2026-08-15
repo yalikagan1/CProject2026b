@@ -44,7 +44,7 @@ void write_externals(char *am_filename, Symbol *symbols, CodeImage *code);
  * @param current_ic value of operation's instruction counter.
  * @return the binary code as int.
  */
-int create_binary_code(Operation op, Symbol *s, int current_ic);
+unsigned int create_binary_code(Operation op, Symbol *s, int current_ic);
 
 /**
  * @brief encode R type operation to binary code (machine code)
@@ -53,17 +53,18 @@ int create_binary_code(Operation op, Symbol *s, int current_ic);
  * @param op the operation to be encoded.
  * @return the binary code as int.
  */
-int create_r_code(Operation op);
+unsigned int create_r_code(Operation op);
 
 /**
  * @brief encode I type operation to binary code (machine code)
  *
  * This function encode I type operation to binary code (machine code) according to assembler rules.
  * @param op the operation to be encoded.
+ * @param s the symbols table from the input file.
  * @param current_ic value of operation's instruction counter.
  * @return the binary code as int.
  */
-int create_i_code(Operation op, int current_ic);
+unsigned int create_i_code(Operation op, Symbol *s, int current_ic);
 
 /**
  * @brief encode J type operation to binary code (machine code)
@@ -73,7 +74,7 @@ int create_i_code(Operation op, int current_ic);
  * @param s the symbols table from the input file.
  * @return the binary code as int.
  */
-int create_j_code(Operation op, Symbol *s);
+unsigned int create_j_code(Operation op, Symbol *s);
 
 /**
  * @brief returns the value of symbol.
@@ -94,4 +95,4 @@ void print_as_binary(int num);
  * @param num number to be encoded.
  * @param str string that hex will be encoded to.
  */
-void int_to_hex(int num, char *str);
+void int_to_hex(unsigned int num, char *str);
