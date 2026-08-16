@@ -37,23 +37,47 @@ int check_line_length(char *line, FILE *file, char *filename, int line_counter);
  * @brief add extension to file.
  *
  * This function add extension to file..
- * @param filename string name of the input file.
- * @param filename string desired extension.
+ * @param filepath string name of the input file with desired extension.
+ * @param ext string desired extension.
  * @return string filepath with desired extension.
  */
 char* add_file_extention(char *filepath, char *ext);
 
+/**
+ * @brief trim whitespaces from string.
+ *
+ * This function trim whitespaces from string.
+ * @param str string to trim whitespaces from.
+ * @return string with trimmed whitespaces.
+ */
 char *trim_whitespaces(char *str);
 
-/* Returns a pointer to the first character that is not a space */
+/**
+ * @brief skip spaces from string.
+ *
+ * This function skip spaces from string.
+ * @param str string to skip spaces from.
+ * @return pointer to the first character that is not a space.
+ */
 char *skip_spaces(char *str);
 
-/* Returns 1 if the line is ended with a newline */
+/**
+ * @brief check if line is ended with a newline.
+ *
+ * This function checks if the line is ended with a newline.
+ * @param line string to check if ended with a newline.
+ * @return 1 if ended with a newline, 0 otherwise.
+ */
 int check_if_line_is_ended(char *line);
 
-/* Reads and throws away everything up to the end of the current line.
-   Returns 1 if there was anything left, which means the line really was cut,
-   and 0 if the file ended right there and nothing was left */
+/**
+ * @brief remove rest of line.
+ *
+ * This function remove rest of line.
+ * @param file file to remove rest of line from.
+ * @return 1 if there was anything left, which means the line was cut,
+ * 0 if the file ended right there and nothing was left, -1 if error.
+ */
 int remove_rest_of_line(FILE *file);
 
 #endif

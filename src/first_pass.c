@@ -1,5 +1,3 @@
-/* first_pass.c - The first pass over the .am file: builds the symbol table,
-   encodes the data image, and gives every instruction its address. */
 #include <stdio.h>
 #include <string.h>
 #include "globals.h"
