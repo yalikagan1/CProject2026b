@@ -2,7 +2,9 @@
 #include "grammar.h"
 
 /**
- * @brief adds an instruction to the code image
+ * @brief adds an instruction to the code image.
+ * this function checks that the line holds a known operation with the operands it expects, 
+ * adds it at the end of the code image with the address ic and the line number.
  *
  * This function adds an instruction to the code image.
  * @param parsed_line the parsed line from the input file.
@@ -13,5 +15,10 @@
  */
 int add_instruction(ParsedLine parsed_line, CodeImage **code, int ic, int line_number);
 
-/* Frees every instruction in the list and leaves the list empty */
+/**
+ * @brief Frees every instruction in the list and leaves the list empty.
+ *
+ * This function frees every instruction in the list and leaves the list empty at the end of the program.
+ * @param code a pointer to the code image.
+ */
 void free_code_image(CodeImage **code);

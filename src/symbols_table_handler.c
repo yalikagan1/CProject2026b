@@ -5,7 +5,8 @@
 #include "grammar.h"
 #include "error_handle.h"
 
-int add_symbol_to_end(Symbol *symbol, Symbol **symbols) {
+/* adding a symbol to the end of the symbols table */
+static int add_symbol_to_end(Symbol *symbol, Symbol **symbols) {
     Symbol *last;
     last = *symbols;
     while (last->next != NULL) {
@@ -15,7 +16,8 @@ int add_symbol_to_end(Symbol *symbol, Symbol **symbols) {
     return 0;
 }
 
-int check_symbol_validity(Symbol *symbol, ParsedLine parsed_line) {
+/* checking the symbol validity and returning the error code if it is not valid */
+static int check_symbol_validity(Symbol *symbol, ParsedLine parsed_line) {
     if (parsed_line.type == DIRECTIVE_ENTRY) {
         if (symbol->is_external) { /* if the symbol is external, it cannot be an entry */
             return ERROR_SYMBOL_ENTRY_AND_EXTERN;
@@ -39,7 +41,8 @@ int check_symbol_validity(Symbol *symbol, ParsedLine parsed_line) {
     return 0;
 }
 
-int update_symbol(Symbol *symbol, ParsedLine parsed_line, int *icf, int *dcf, int line_number) {
+/* another main function that checks the symbol validity and updates the symbol with the information from the parsed line. */
+static int update_symbol(Symbol *symbol, ParsedLine parsed_line, int *icf, int *dcf, int line_number) {
     int err;
     err = check_symbol_validity(symbol, parsed_line);
     if (err != 0) {
@@ -77,8 +80,8 @@ Symbol *find_symbol(char *name, Symbol **symbols) {
     return NULL;
 }
 
-
-char *get_symbol_name(ParsedLine *parsed_line) {
+/* getting the symbol name from the parsed line, for entry and extern directives */
+static char *get_symbol_name(ParsedLine *parsed_line) {
     if (parsed_line->type == DIRECTIVE_ENTRY || parsed_line->type == DIRECTIVE_EXTERN) {
         return parsed_line->operands;
     }
@@ -87,7 +90,8 @@ char *get_symbol_name(ParsedLine *parsed_line) {
     }
 }
 
-Symbol *create_new_symbol(Symbol *new_symbol, char *symbol_name, Symbol **symbols) {
+/* creating a new symbol in the symbols table with empty values */
+static Symbol *create_new_symbol(Symbol *new_symbol, char *symbol_name, Symbol **symbols) {
     new_symbol->is_code = 0;
     new_symbol->is_data = 0;
     new_symbol->is_external = 0;

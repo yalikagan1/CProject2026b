@@ -11,7 +11,7 @@
  * @param data a pointer to the data image.
  * @param icf a pointer to the instruction counter.
  * @param dcf a pointer to the data counter.
- * @return 0 if success, error code if error
+ * @return 1 if success, 0 if error
  */
 int first_pass(char *am_filename, Symbol **symbols, CodeImage **code,
                DataImage *data, int *icf, int *dcf);

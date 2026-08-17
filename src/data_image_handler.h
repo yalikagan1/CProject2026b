@@ -3,6 +3,7 @@
 
 /**
  * @brief The function writes encoded numbers or string into the data image.
+ * this is making the ground for second pass of the assembler.
  *
  * This function writes encoded numbers or string into the data image.
  * @param type the type of the directive.

@@ -11,7 +11,7 @@
  * @param data a pointer to linked list of the data image.
  * @param icf a pointer to the final instruction counter.
  * @param dcf a pointer to the final data counter.
- * @return 1 if success, -1 if any error
+ * @return 1 if success, -1 if error
  */
 int second_pass(char *am_filename, Symbol *symbols, CodeImage *code,
     DataImage *data, int *icf, int *dcf);

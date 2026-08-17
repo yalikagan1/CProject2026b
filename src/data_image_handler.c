@@ -22,6 +22,7 @@ static int is_number_in_range(long value, int size_of_directive) {
     return value >= -limit && value <= limit - 1;
 }
 
+/* write a given number to the data image */
 static int write_number_to_data_image(DataImage *data, long value, int size_of_directive) {
     int i;
 
@@ -37,7 +38,7 @@ static int write_number_to_data_image(DataImage *data, long value, int size_of_d
     return 0;
 }
 
-
+/* assuming the next number into value and then validates it*/
 static int validate_next_number_and_assign_to_value(char **text, long *value, int size) {
     char *end;
 
@@ -66,7 +67,7 @@ static int validate_next_number_and_assign_to_value(char **text, long *value, in
     return 0;
 }
 
-
+/* encodes numbers into the data image */
 static int encode_numbers(char *operands, DirectiveType type, DataImage *data) {
     char *text = skip_spaces(operands);
     int size = size_of_directive(type);
@@ -106,6 +107,7 @@ static int encode_numbers(char *operands, DirectiveType type, DataImage *data) {
     return 0;
 }
 
+/* validates the quotes in the operands */
 static char *check_quotes(char *text) {
     char *last_quote;
 
@@ -126,6 +128,7 @@ static char *check_quotes(char *text) {
     return last_quote;
 }
 
+/* encodes the string into the data image, only for .asciiz directive */
 static int encode_asciiz(char *operands, DataImage *data) {
     char *text = skip_spaces(operands);
     char *last_quote;

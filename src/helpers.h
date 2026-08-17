@@ -76,7 +76,7 @@ int check_if_line_is_ended(char *line);
  * This function remove rest of line.
  * @param file file to remove rest of line from.
  * @return 1 if there was anything left, which means the line was cut,
- * 0 if the file ended right there and nothing was left, -1 if error.
+ * 0 if the file ended right there and nothing was left.
  */
 int remove_rest_of_line(FILE *file);
 

@@ -7,12 +7,14 @@
 #include <string.h>
 #include <stdlib.h>
 
+/* checks if the immediate arg type is in range */
 static int is_immediate_in_range(char *arg) {
     long value = strtol(arg, NULL, 10);
 
     return value >= MIN_IMMEDIATE && value <= MAX_IMMEDIATE;
 }
 
+/* validates the correctness of the operands types of the operation */
 static int validate_operands(char *arg1, char *arg2, char *arg3, Operation *operation) {
     switch (operation->format) {
         case OP_FORMAT_RRR:
@@ -58,6 +60,7 @@ static int validate_operands(char *arg1, char *arg2, char *arg3, Operation *oper
     return 0;
 }
 
+/* adds a node to the code image at the end */
 static void add_node_to_code_image_at_the_end(CodeImage *node, CodeImage **code) {
     CodeImage *last_node;
 
@@ -74,13 +77,14 @@ static void add_node_to_code_image_at_the_end(CodeImage *node, CodeImage **code)
     last_node->next = node;
 }
 
-
+/* frees all the code image node arguments */
 static void free_all_arguments(char *arg1, char *arg2, char *arg3) {
     free(arg1);
     free(arg2);
     free(arg3);
 }
 
+/* allocating memory for each argument*/
 static char *copy_argument(char *token) {
     char *copy = malloc(strlen(token) + 1);
 
@@ -92,6 +96,7 @@ static char *copy_argument(char *token) {
     return copy;
 }
 
+/* validates the correctness of the commas in the operands */
 static int commas_validation(char *operands) {
     char *text = skip_spaces(operands);
 
@@ -115,6 +120,8 @@ static int commas_validation(char *operands) {
     return 0;
 }
 
+/* another main function that extracts and assumes the arguments of the operation, 
+returns error if there is an error, 0 if success */
 int extract_and_assume_arguments(char *operands, Operation *operation) {
     char *token;
     char *delimiter = ",";

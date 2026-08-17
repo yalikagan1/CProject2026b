@@ -1,6 +1,3 @@
-/* line_parser.h - Splits one line of assembly into the parts that the first
-   pass works with. It only takes the line apart, it does not try to
-   understand the operands. */
 #ifndef LINE_PARSER_H
 #define LINE_PARSER_H
 
@@ -14,9 +11,16 @@ typedef struct {
     DirectiveType type;                 /* DIRECTIVE_NONE when the line is an instruction */
 } ParsedLine;
 
-/* Takes the line apart into the struct above. The operands field points into
-   the line itself, so it is only good until the next line is read.
-   Returns 0 when the line is fine, or the code of the error that was found */
+/**
+ * @brief Splits one line into the label, the name and the operands.
+ *
+ * This function splits one line of assembly into the label, the name and the operands.
+ * The line has to be trimmed already, and not empty or a comment.
+ * The operands field points into the line itself, so it is good only until the next line is read over it.
+ * @param line the line to parse, it is not changed.
+ * @param parsed the struct to fill, every field is written.
+ * @return 0 if success, error code if error.
+ */
 int parse_line(char *line, ParsedLine *parsed);
 
 #endif
